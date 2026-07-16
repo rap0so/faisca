@@ -1,0 +1,75 @@
+<Analogia titulo="O ponteiro do relógio e seu prego">
+
+Um ponteiro de relógio gira em torno de um **prego** fincado numa ponta. Se você
+fincasse o prego no meio do ponteiro, ele giraria como uma hélice — em torno do
+centro. Se fincasse na ponta, ele varreria como um limpador de para-brisa. O
+**mesmo** ponteiro, girando o **mesmo** ângulo, produz movimentos completamente
+diferentes dependendo de **onde está o prego**.
+
+Esse prego é o `transform-origin`. Toda rotação, escala e giro acontece **em torno
+dele**. O erro nº 1 de quem anima ícones é esquecer disso: você manda o ícone
+girar, ele gira em torno do canto superior-esquerdo (o padrão em alguns contextos),
+e o movimento fica estranho, torto, "errado" sem você saber por quê. Acertar o
+pivô — quase sempre `center` — é o que separa uma micro-interação profissional de
+uma amadora. Ícones são o campo de treino perfeito: pequenos, reutilizáveis, e cada
+detalhe conta.
+
+</Analogia>
+
+## O pivô certo mais o gesto certo
+
+```css
+.icon {
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center;   /* o "prego" no meio */
+}
+.icon:hover {
+  transform: rotate(-8deg) scale(1.15);
+}
+```
+
+Três ingredientes: uma `transition` (para o movimento ser suave), o
+`transform-origin: center` (o pivô), e o gesto no `:hover`. O overshoot no easing
+dá aquele "saltinho" vivo que ícones bons têm.
+
+<Aprofundamento titulo="transform-box: a pegadinha do transform-origin no SVG">
+
+Aqui mora um detalhe que faz gente perder horas. Dentro de um SVG, `transform-origin:
+center` pode se comportar diferente do esperado, porque o navegador precisa decidir
+"centro de quê?" — do elemento, ou de todo o sistema de coordenadas do SVG.
+
+A propriedade `transform-box` resolve isso:
+
+```css
+.icon-part {
+  transform-box: fill-box;   /* o "center" passa a ser o do próprio elemento */
+  transform-origin: center;
+}
+```
+
+Com `transform-box: fill-box`, o `center` vira o centro da **caixa de preenchimento
+do próprio elemento** — que é quase sempre o que você quer ao girar uma parte
+específica de um ícone (uma engrenagem, uma seta, um sino balançando).
+
+Quando você anima o SVG **inteiro** como um bloco (como faremos no exercício, com
+`.icon` sendo o `<svg>` todo), o `transform-origin: center` no elemento HTML já
+funciona direto. A sutileza do `transform-box` aparece quando você anima **partes
+internas** do SVG — guarde essa carta na manga.
+
+</Aprofundamento>
+
+<Dica>
+Micro-interações de ícone devem ser **discretas**: um giro de 8°, uma escala de
+1.1–1.15, uma duração curta. Se o ícone dá cambalhota, é festa demais. O bom gosto
+mora na contenção — o Módulo 5 é inteiro sobre isso.
+</Dica>
+
+<Meta>
+
+Faça o ícone de seta reagir ao passar o mouse:
+
+1. `transition` na propriedade `transform` (~250ms).
+2. `transform-origin: center` (o pivô no meio).
+3. No `:hover`, gire e cresça: `transform: rotate(-8deg) scale(1.15)`.
+
+</Meta>

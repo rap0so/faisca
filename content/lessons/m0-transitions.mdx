@@ -1,0 +1,82 @@
+<Analogia titulo="O interruptor com dimmer">
+
+Imagina o interruptor de luz do seu quarto. O comum é brutinho: ou a luz está
+**acesa**, ou está **apagada**. Não existe meio-termo — é *tec* e pronto.
+
+Agora pensa num interruptor com **dimmer**, aquele de girar. Você gira devagar e
+a luz vai *deslizando* do escuro pro claro, passando por todos os pontos no
+caminho. Mesmo começo, mesmo fim — mas a viagem entre eles é suave.
+
+Uma `transition` no CSS é exatamente esse dimmer. Sem ela, quando um estilo muda
+(a cor, o tamanho, a posição), o navegador troca na hora, *tec*. Com ela, você
+diz: "ei, não pula direto — **percorra** o caminho entre o valor antigo e o novo".
+
+</Analogia>
+
+## O que está realmente acontecendo
+
+Toda `transition` responde a três perguntas:
+
+1. **O quê** vai ser animado? (`transition-property`)
+2. **Por quanto tempo**? (`transition-duration`)
+3. **Com que ritmo**? (`transition-timing-function` — o assunto da próxima lição)
+
+Brinca com o dimmer abaixo. É a mesma bolinha indo do ponto A ao ponto B — o que
+muda é só o *ritmo* da viagem:
+
+<Demo titulo="O mesmo movimento, ritmos diferentes">
+  <TransitionDemo />
+</Demo>
+
+Repara que o **começo** e o **fim** são idênticos nos três botões. A `transition`
+nunca muda *para onde* a coisa vai — ela só cuida do trajeto.
+
+## Nem tudo é animável
+
+Aqui vem a pegadinha que pega todo mundo: **nem toda propriedade pode ser
+animada**. E o motivo é lindo quando você entende.
+
+Para o navegador conseguir criar os quadros intermediários, ele precisa saber
+calcular os "valores do meio". Entre `opacity: 0` e `opacity: 1` existe o `0.5`,
+o `0.73`... um número contínuo. Fácil. Entre `width: 100px` e `width: 300px`
+também: dá pra medir cada pixel no caminho.
+
+Mas e entre `display: none` e `display: block`? Não existe "meio bloco". É um
+valor **discreto** — ou é uma coisa, ou é outra, sem escala entre elas. Por isso
+`display` não anima (do jeito clássico). O navegador não tem por onde interpolar.
+
+<Aprofundamento titulo="A regra mental: dá pra medir 'metade do caminho'?">
+
+Quando estiver na dúvida se uma propriedade anima, faça esta pergunta:
+**"existe um valor exatamente no meio entre A e B?"**
+
+- `color: red → blue` → existe um roxo no meio. **Anima.**
+- `transform: scale(1) → scale(2)` → existe `scale(1.5)`. **Anima.**
+- `visibility: hidden → visible` → não existe "meio-visível"... mas essa é a
+  exceção charmosa: `visibility` anima de forma *discreta*, esperando o fim da
+  duração pra trocar. Útil pra atrasar o desaparecimento.
+- `font-family: serif → sans-serif` → não existe fonte "no meio". **Não anima.**
+
+A lista oficial de propriedades animáveis é grande, mas você quase nunca precisa
+decorá-la: a intuição do "valor do meio" acerta na esmagadora maioria das vezes.
+
+</Aprofundamento>
+
+<Dica>
+Anime de propósito só `transform` e `opacity` sempre que der — elas são as
+"baratas" pro navegador (você vai entender *por quê* na lição de compositing).
+Animar `width`, `top` ou `margin` funciona, mas cobra um preço de performance.
+</Dica>
+
+<Meta>
+
+Faça o cartão **crescer suavemente** quando o mouse passar por cima:
+
+1. Adicione uma `transition` na `.card` para a propriedade `transform`.
+2. Use uma duração de **240ms**.
+3. No `:hover`, aumente a escala com `transform: scale(1.08)`.
+
+Quando estiver pronto, clique em **Verificar**. Os checks vão conferir cada um
+desses três pontos.
+
+</Meta>

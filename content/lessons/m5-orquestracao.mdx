@@ -1,0 +1,76 @@
+<Analogia titulo="A plateia que se levanta em ola">
+
+Imagina um estádio onde todo mundo se levanta **exatamente ao mesmo tempo**. É...
+um susto. Um borrão. Seu olho não sabe para onde olhar, e o efeito é confuso. Agora
+imagina a **ola**: as pessoas se levantam em sequência, uma onda que varre a
+arquibancada. De repente há **direção**, ritmo, beleza. Seu olho **segue** a onda. A
+mesma ação — todo mundo levantando — vira ou caos ou coreografia, dependendo só do
+**timing entre os elementos**.
+
+Isso é orquestração. Quando vários elementos animam juntos (uma lista que aparece,
+os cards de um dashboard, os itens de um menu), fazê-los entrar **todos de uma vez**
+é a ola-susto: um pulo abrupto que o cérebro lê como "recarregou". Escaloná-los —
+o **stagger** — cria a ola: uma cascata que guia o olhar e dá a sensação de que a
+interface foi **montada com cuidado**, peça por peça. Orquestração é a diferença
+entre um monte de animações e **uma** animação com muitas vozes.
+
+</Analogia>
+
+## Stagger: a cascata que guia o olho
+
+<Demo titulo="Tudo junto vs. em cascata">
+  <StaggerDemo />
+</Demo>
+
+Ligue e desligue o stagger acima. Sem ele, as barras "piscam" para dentro juntas —
+funcional, mas sem alma. Com ele, elas sobem em sequência, e seu olho **percorre** a
+fileira da esquerda para a direita. Um pequeno atraso por elemento (aqui, 90ms)
+transforma um evento em uma **frase visual**.
+
+O stagger faz três coisas de uma vez:
+
+1. **Guia a atenção** numa direção (da esquerda pra direita, de cima pra baixo, do
+   centro pra fora).
+2. **Reduz a carga cognitiva** — em vez de processar 5 coisas de uma vez, o olho
+   recebe uma de cada vez.
+3. **Comunica hierarquia** — o que entra primeiro parece mais importante.
+
+<Aprofundamento titulo="A matemática do ritmo e a hierarquia de atenção">
+
+O parâmetro mágico é o **atraso entre elementos**. E ele tem uma faixa estreita de
+bom gosto:
+
+- **Rápido demais** (< 30ms) — vira "tudo junto", o efeito se perde.
+- **Ponto doce** (~40–100ms por item) — lê como cascata elegante.
+- **Lento demais** (> 150ms com muitos itens) — vira espera; o usuário fica
+  batendo o pé enquanto o quinto item ainda não chegou.
+
+Uma regra crucial de UX: o stagger deve caber num **orçamento total** de ~300–500ms.
+Se você tem 20 itens, 90ms cada = 1.8s de espera até o último — inaceitável. A
+solução é **encurtar o atraso conforme o número cresce** (ou animar só os itens
+visíveis, com IntersectionObserver do Módulo 3). Delícia vira lentidão rápido.
+
+E há a **hierarquia de atenção**, o nível acima do stagger: nem tudo numa tela é
+igualmente importante. Uma boa orquestração de entrada estabelece uma ordem de
+leitura — o título entra primeiro e com mais presença, depois o conteúdo, depois os
+detalhes secundários. Você está **dirigindo o olhar** do usuário, decidindo o que
+ele vê em que ordem. Ferramentas como o Motion tornam isso quase trivial
+(`staggerChildren`, `delayChildren`), mas o julgamento — quanto, em que ordem, com
+que ritmo — é seu, e é o que separa uma orquestração que canta de uma que arrasta.
+
+</Aprofundamento>
+
+<Dica>
+Direção importa: stagger de cima para baixo parece "revelar/descer"; de baixo para
+cima parece "construir/subir"; do centro para fora parece "explodir/florescer".
+Escolha a direção que combina com o significado — não é decoração, é gramática.
+</Dica>
+
+<Meta>
+
+Explore o demo até sentir a diferença entre a "ola-susto" e a cascata. Pense em
+listas e grids que você já construiu: como um stagger sutil mudaria a sensação
+deles? Marque como concluída quando o conceito de "dirigir o olhar com timing"
+estiver claro.
+
+</Meta>

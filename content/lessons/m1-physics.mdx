@@ -1,0 +1,74 @@
+<Analogia titulo="A bola de basquete que quica">
+
+Solta uma bola de basquete. O que acontece? Ela cai — e cai **cada vez mais
+rápido**, porque a gravidade puxa sem parar. Bate no chão, quica, mas volta mais
+baixo do que caiu, porque perdeu energia no impacto. Quica de novo, mais baixo
+ainda. Até parar.
+
+Nenhum artista animou isso quadro a quadro. É pura **física acumulada frame a
+frame**, e a receita é ridiculamente simples: a gravidade aumenta a velocidade um
+tico a cada instante, e a velocidade move a posição. É só isso. Some um "perde
+energia ao bater no chão" e você tem uma bola que quica de forma convincente. A
+mágica das animações físicas não está em fórmulas complicadas — está em aplicar
+regrinhas bobas, repetidamente, 60 vezes por segundo.
+
+</Analogia>
+
+## O passo de simulação
+
+O coração de qualquer física é o "passo": dado o estado agora, calcule o estado do
+próximo frame.
+
+```js
+function stepGravity(state, gravity) {
+  const vy = state.vy + gravity; // 1. gravidade acelera a velocidade
+  const y = state.y + vy;        // 2. a velocidade move a posição
+  return { y, vy };
+}
+```
+
+Duas linhas. A ordem importa: primeiro a gravidade mexe na velocidade, depois a
+velocidade (já atualizada) move a posição. Rode isso a cada frame e você tem queda
+acelerada. Adicione `if (y > chão) vy *= -0.7` e a bola quica, perdendo 30% da
+energia a cada batida (o `-` inverte a direção; o `0.7` é o "quão elástica" ela é).
+
+<Aprofundamento titulo="Velocidade, aceleração e atrito — o vocabulário completo">
+
+Três ingredientes constroem quase toda simulação:
+
+- **Velocidade** (`v`): quanto a posição muda por frame. `pos += v`.
+- **Aceleração** (`a`): quanto a velocidade muda por frame. `v += a`. Gravidade é
+  só uma aceleração constante para baixo.
+- **Atrito / arrasto**: um freio que reduz a velocidade a cada frame,
+  multiplicando por um fator < 1. `v *= 0.98` tira 2% da velocidade por frame — é
+  o que faz as coisas **desacelerarem e pararem** em vez de deslizarem para
+  sempre.
+
+Com esses três você monta: um objeto arremessado (velocidade inicial + gravidade),
+que desacelera no ar (arrasto) e quica no chão (inversão com perda). Empilhe
+"forças" somando acelerações e você tem vento, ímãs, molas.
+
+Um aviso de precisão: essa é a **integração de Euler**, simples e ótima para
+efeitos visuais. Ela acumula um errinho por frame — irrelevante para partículas,
+mas por isso engenheiros usam métodos mais caros (Verlet, RK4) quando a exatidão
+importa. Para deixar a web gostosa, Euler basta e sobra.
+
+</Aprofundamento>
+
+<Dica>
+Multiplicar a velocidade por um número entre 0 e 1 é seu canivete suíço:
+`v *= 0.9` é atrito forte (para rápido), `v *= 0.99` é atrito sutil (desliza
+bastante). Ajustar esse único número muda toda a "sensação" de peso do objeto.
+</Dica>
+
+<Meta>
+
+Implemente `stepGravity(state, gravity)`, com `state = { y, vy }`:
+
+1. nova velocidade `vy` = `state.vy + gravity`
+2. nova posição `y` = `state.y + vy` (a velocidade já atualizada)
+3. retorne `{ y, vy }`
+
+Se acertar, a bola da demo vai cair e quicar sozinha.
+
+</Meta>

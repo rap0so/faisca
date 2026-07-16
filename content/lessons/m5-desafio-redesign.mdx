@@ -1,0 +1,79 @@
+<Analogia titulo="O 'obrigado' sem graça vs. o que faz sorrir">
+
+Duas lojas te entregam a compra. A primeira diz "obrigado" com voz de robô, olhando
+para o lado. A segunda te olha nos olhos, sorri, diz "muito obrigado, volte sempre!"
+— e você sai com uma sensação boa que nem sabe explicar. Mesma transação, mesmas
+palavras quase. A diferença é toda **na entrega** — no calor humano de um gesto bem
+feito.
+
+Interfaces têm esses dois "obrigados" o tempo todo. Um botão "Adicionar ao carrinho"
+que troca o texto na hora, seco, cumpre a função — e é esquecível. O mesmo botão com
+uma micro-interação bem pensada — um afundar no clique, um ✓ que entra com vida, uma
+cor que transiciona com calma — vira um pequeno momento de deleite que faz a pessoa
+gostar de usar seu produto. Este é o desafio de fechamento do módulo, e é diferente
+de todos os outros: não há checks automáticos, não há resposta certa. Há só você, um
+código honesto porém sem graça, e tudo que você aprendeu sobre **gosto**. Sua missão
+é dar alma a ele.
+
+</Analogia>
+
+## Do "funciona" ao "que gostoso"
+
+No editor há um botão de carrinho que funciona: clica, o texto e a cor trocam. Mas a
+troca é um **corte seco** — sem transição, sem tato, sem deleite. Seu trabalho é
+redesenhar a *sensação* dessa interação, aplicando o julgamento do módulo inteiro.
+
+Algumas direções (escolha, combine, invente — não faça todas):
+
+- **Transição, sempre.** A cor não deveria trocar no susto. Um `transition` já muda
+  tudo (Módulo 0).
+- **Feedback tátil.** Um `:active` que afunda; talvez um pulinho de confirmação com
+  overshoot (Módulos 0 e 2).
+- **Um momento de deleite.** O `✓` pode **entrar animado** (escala, desliza); um
+  brilho rápido; um shake sutil de "feito!". Discreto — lembre da pimenta.
+- **Respeito.** `prefers-reduced-motion` desligando os deslocamentos (o módulo
+  inteiro prega isso — pratique).
+
+<Aprofundamento titulo="Como julgar o próprio gosto (a parte difícil)">
+
+Escrever a animação é a parte fácil agora — você tem as ferramentas. A parte difícil,
+e a que este desafio treina, é **julgar** o resultado com honestidade. Alguns testes
+que os profissionais aplicam ao próprio trabalho:
+
+- **O teste da décima vez.** Clique seu botão dez vezes seguidas. Na décima, a
+  animação ainda agrada, ou já irrita? Interações frequentes precisam sobreviver à
+  repetição. Se cansou, encurte, suavize, ou tire.
+- **O teste da velocidade.** Cronometre mentalmente: a animação **atrasa** você? Se
+  você sente que está esperando o botão terminar o show antes de poder continuar, ela
+  está lenta demais. Feedback frequente mora na faixa de 150–250ms.
+- **O teste do "e se eu tirar?".** Remova cada pedaço da sua animação, um por um. O
+  que, ao sair, deixa a interação pior? Isso fica. O que sai sem falta? Era ego.
+- **O teste do reduced-motion.** Ligue a preferência e reveja. A interação ainda dá
+  feedback claro (por cor, por opacidade), só que sem se mover? Se ela **quebra** ou
+  fica sem feedback, você dependeu demais do movimento.
+
+Não existe gabarito porque bom gosto não é uma fórmula — é um músculo. O checklist
+ao lado não vai te dar uma nota; ele vai te fazer as perguntas certas para você
+mesmo julgar. E é assim no trabalho real: ninguém te entrega o "certo", você
+desenvolve o olho. Este desafio é o seu treino. Quando estiver orgulhoso da sensação
+— não só do funcionamento — você fechou o módulo mais importante do curso.
+
+</Aprofundamento>
+
+<Dica>
+Menos é quase sempre mais aqui. Se estiver na dúvida entre duas versões, escolha a
+**mais contida**. É muito mais fácil uma animação de produto pecar por exagero do
+que por sutileza — e a sutileza envelhece melhor.
+</Dica>
+
+<Meta>
+
+Redesenhe a **sensação** do botão de carrinho, transformando o corte seco em algo
+com personalidade. Use o que fizer sentido: transição, feedback de clique, um deleite
+discreto na confirmação, e o guard de `prefers-reduced-motion`.
+
+Quando estiver satisfeito — de verdade, passando nos "testes de gosto" do
+aprofundamento — use o **checklist** para se avaliar e marque como concluída. Não há
+resposta certa; há a sua, feita com julgamento.
+
+</Meta>

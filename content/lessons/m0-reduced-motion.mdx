@@ -1,0 +1,74 @@
+<Analogia titulo="O vagão silencioso do trem">
+
+Alguns trens têm um **vagão silencioso**: sem telefone alto, sem música, luz mais
+baixa. Não é que o resto do trem seja proibido de ter barulho — é que existe gente
+para quem aquilo não é conforto, é sofrimento. O trem oferece uma escolha, e
+respeita quem a fez.
+
+Movimento na tela é a mesma coisa. Para muita gente, animações são deliciosas.
+Mas para quem tem sensibilidade vestibular, um parallax agressivo ou um zoom
+brusco pode causar **tontura, náusea, enxaqueca de verdade** — a tela vira o mar
+revolto de um barco. O sistema operacional deixa essas pessoas pedirem "menos
+movimento, por favor", e o CSS te entrega esse pedido através de uma media query.
+Respeitar isso não é enfeite de acessibilidade: é não deixar seu site passar mal
+alguém.
+
+</Analogia>
+
+## O guard que todo movimento merece
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+```
+
+Você não precisa remover **todo** o feedback — só o movimento que pode incomodar.
+Muitas vezes a melhor resposta não é "nada acontece", e sim "acontece sem se
+mexer": trocar um slide por um simples fade de opacidade, encurtar durações,
+desligar loops infinitos e parallax.
+
+<Aprofundamento titulo="Duas estratégias: opt-out e opt-in">
+
+**Opt-out (mais comum):** você anima normalmente e *desliga* quando pedirem menos
+movimento. É o que faremos aqui. Simples, mas fácil de esquecer um cantinho.
+
+**Opt-in (mais seguro):** você começa **sem** animação e só *liga* dentro de
+`@media (prefers-reduced-motion: no-preference)`. Assim, se você esquecer de
+cobrir algum caso, o padrão já é o seguro (sem movimento). Em projetos grandes,
+essa inversão evita muita animação escapando sem guard.
+
+```css
+/* opt-in: o padrão é quieto */
+.card { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: opacity 300ms; }
+}
+```
+
+Um detalhe importante: `prefers-reduced-motion` pede menos **movimento**, não
+menos **feedback**. Mudanças de cor, opacidade sutil e estados de foco geralmente
+continuam ok — o que incomoda é o deslocamento no espaço.
+
+</Aprofundamento>
+
+<Dica>
+No macOS: Ajustes → Acessibilidade → Tela → "Reduzir movimento". Ligue e recarregue
+a lição para testar de verdade. A plataforma inteira que você está usando respeita
+essa configuração — ela pratica o que ensina.
+</Dica>
+
+<Meta>
+
+O spinner gira sem parar — um problema para quem tem sensibilidade vestibular.
+Adicione o guard que desliga a animação sob demanda:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+}
+```
+
+</Meta>

@@ -1,0 +1,74 @@
+<Analogia titulo="A receita guardada na despensa">
+
+Num restaurante, o chef não descreve a receita do molho especial toda vez que faz
+um prato. Ele guarda a receita num caderninho na despensa, dá um **nome** a ela, e
+quando precisa só diz "usa o molho da casa". Vários pratos apontam para a mesma
+receita guardada.
+
+No SVG, a "despensa" é a tag `<defs>` (de *definitions*). Você define lá dentro
+coisas reutilizáveis — gradientes, máscaras, filtros — cada uma com um **`id`**. E
+então, em qualquer forma, você aponta para ela com `url(#nome)`. Um único gradiente
+definido uma vez pode pintar dez formas diferentes. Máscaras recortam. Filtros
+aplicam desfoque, sombra, brilho. É um sistema de "ingredientes nomeados" que deixa
+seu SVG poderoso sem repetição — e abre a porta para efeitos que o CSS sozinho não
+faz.
+
+</Analogia>
+
+## Um gradiente, aplicado por referência
+
+```html
+<svg viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#ffb03a" />
+      <stop offset="100%" stop-color="#7c5cff" />
+    </linearGradient>
+  </defs>
+  <rect class="shape" x="10" y="10" width="80" height="80" rx="16" />
+</svg>
+```
+```css
+.shape { fill: url(#grad); }
+```
+
+O `<linearGradient>` mora na despensa com `id="grad"`. Os `<stop>` são as paradas
+de cor ao longo do caminho (0% = âmbar, 100% = violeta). A forma só diz `fill:
+url(#grad)` e pronto — a receita é aplicada.
+
+<Aprofundamento titulo="Máscaras e filtros: recortar e transformar luz">
+
+Gradientes são só o começo do que vive em `<defs>`:
+
+**Máscaras** (`<mask>`) recortam usando **luminância**: onde a máscara é branca, o
+elemento aparece; onde é preta, some; cinza = semitransparente. Isso permite
+recortes impossíveis no CSS — como um texto "furado" revelando uma imagem, ou uma
+borda que some suavemente (fade-out em máscara de gradiente).
+
+**Filtros** (`<filter>`) processam pixels de verdade: `<feGaussianBlur>` desfoca,
+`<feDropShadow>` faz sombra, `<feColorMatrix>` mexe nas cores, `<feTurbulence>`
+gera ruído orgânico. Combinando primitivas de filtro você cria efeitos como
+"goo/blob" (aquele grude líquido onde formas se fundem), textura de papel, brilho.
+
+Um aviso de performance que conecta com o Módulo 1: filtros SVG são **caros** —
+processam pixel a pixel a cada frame. Lindos parados ou em transições curtas;
+perigosos em loops contínuos. Como sempre: meça, e não anime um `<filter>` a 60fps
+sem checar o custo.
+
+</Aprofundamento>
+
+<Dica>
+Gradientes têm dois tipos: `<linearGradient>` (transição em linha reta, com
+`x1,y1 → x2,y2`) e `<radialGradient>` (transição do centro para fora, ótimo para
+brilhos e esferas). Trocar um pelo outro muda completamente a sensação de volume.
+</Dica>
+
+<Meta>
+
+Pinte o quadrado com um gradiente que você mesmo define:
+
+1. Dentro de `<defs>`, crie um `<linearGradient id="grad">` com dois `<stop>`: um
+   âmbar (`#ffb03a`) em `0%` e um violeta (`#7c5cff`) em `100%`.
+2. No CSS, preencha o `.shape` com `fill: url(#grad)`.
+
+</Meta>

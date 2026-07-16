@@ -1,0 +1,88 @@
+<Analogia titulo="O sensor de presença do corredor">
+
+Sabe aqueles corredores onde as luzes acendem sozinhas quando você passa? Não há
+alguém vigiando cada trecho — há **sensores** espalhados que avisam "chegou
+alguém aqui" e a luz reage. Ninguém precisa ficar checando o corredor
+constantemente; o sensor cutuca só quando algo muda.
+
+O `IntersectionObserver` é esse sensor de presença para elementos na tela. Em vez de
+você ficar perguntando a cada frame "esse elemento já apareceu? e agora? e agora?"
+(caro e trabalhoso), você **registra um observador** e o navegador te cutuca **só
+quando** um elemento entra ou sai da viewport. É a ferramenta por trás do
+**scrollytelling** — aquelas páginas onde textos, imagens e gráficos aparecem,
+mudam e contam uma história conforme você rola. Também é o motor de lazy-loading de
+imagens, de "infinite scroll" e de animações de revelação. Eficiente, elegante, e
+muito mais fácil do que parece.
+
+</Analogia>
+
+## O padrão do observador
+
+```js
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+    }
+  });
+});
+
+document.querySelectorAll(".panel").forEach((p) => io.observe(p));
+```
+
+Três passos: você **cria** um observer com um callback, manda **observar** os
+elementos, e o navegador chama seu callback com uma lista de `entries` sempre que a
+visibilidade de algum muda. Cada `entry` tem `isIntersecting` (está na tela?) e o
+`target` (qual elemento). O CSS faz o resto — a classe `visible` dispara a
+transição.
+
+<Aprofundamento titulo="threshold, rootMargin e o padrão 'anima uma vez'">
+
+O construtor aceita opções que dão controle fino:
+
+- **`threshold`** — que fração do elemento precisa estar visível para disparar.
+  `0` = qualquer pixelzinho; `1` = o elemento inteiro; `0.5` = metade. Um array
+  (`[0, 0.25, 0.5, 1]`) dispara em vários pontos — útil para efeitos progressivos.
+- **`rootMargin`** — "estica" ou "encolhe" a área de detecção. `rootMargin: "-100px"`
+  faz o elemento só contar como visível quando estiver 100px **dentro** da tela —
+  ótimo para não disparar cedo demais na borda.
+
+E um padrão que você vai querer quase sempre: **animar só uma vez**. Sem cuidado, o
+elemento faz fade in ao entrar, fade out ao sair, e fica piscando conforme você
+rola de um lado para o outro. A solução é parar de observar depois do primeiro
+disparo:
+
+```js
+if (entry.isIntersecting) {
+  entry.target.classList.add("visible");
+  io.unobserve(entry.target); // já revelou, não precisa mais vigiar
+}
+```
+
+Isso também é mais eficiente — o navegador para de rastrear o que já cumpriu seu
+papel. E lembre do elo com a acessibilidade: as transições que você dispara
+(opacidade, `translateY`) devem respeitar `prefers-reduced-motion`, trocando o
+deslize por um fade simples ou por nada.
+
+**Quando usar IntersectionObserver e quando usar as scroll-driven animations da
+lição anterior?** Regra prática: se é um estado binário ("apareceu → revela"), o
+Observer é perfeito e tem suporte universal. Se você quer um progresso **contínuo**
+ligado à rolagem (uma barra enchendo, um parallax), `animation-timeline` em CSS é
+mais suave. Muitas vezes você usa os dois na mesma página.
+
+</Aprofundamento>
+
+<Dica>
+Não crie um observer por elemento — crie **um** observer e mande ele observar
+vários. O mesmo callback recebe todos, e o navegador otimiza tudo junto.
+</Dica>
+
+<Meta>
+
+Complete o callback do `IntersectionObserver`: quando um elemento estiver visível
+(`entry.isIntersecting`), adicione a classe `visible` ao `entry.target`.
+
+O painel começa transparente e deslocado; ao entrar na tela, ele revela com uma
+transição suave.
+
+</Meta>

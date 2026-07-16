@@ -9,6 +9,11 @@
     "ignoreUnknown": true,
     "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
   },
+  "css": {
+    "parser": {
+      "cssModules": true
+    }
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -20,6 +25,9 @@
       "recommended": true,
       "suspicious": {
         "noUnknownAtRules": "off"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
       }
     },
     "domains": {

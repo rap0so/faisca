@@ -1,0 +1,78 @@
+<Analogia titulo="A planta baixa desenhada em escala">
+
+Um arquiteto desenha uma casa de 10 metros num papel de 20 centímetros. Ele não
+encolhe a casa — ele usa uma **escala**: "cada metro real vira 2 centímetros no
+papel". Toda planta baixa é isso: uma função que traduz medidas do mundo real para
+medidas do papel. Sem escala, o desenho não cabe; com ela, tudo se encaixa
+proporcionalmente.
+
+Um gráfico é a mesma coisa. Seus dados vivem num mundo (vendas de 0 a 100, meses de
+janeiro a dezembro) e a tela vive em outro (0 a 260 pixels de largura, 0 a 160 de
+altura). O coração de **toda** visualização de dados — de uma sparkline a um
+dashboard do D3 — é uma função de **escala** que traduz "valor do dado" em
+"coordenada de pixel". Bibliotecas de gráfico são, no fundo, montanhas de código em
+volta dessa ideia simples. Nesta lição você escreve a sua, do zero, e nunca mais
+vai olhar para um gráfico do mesmo jeito.
+
+</Analogia>
+
+## A escala do eixo Y (a que inverte)
+
+O pulo do gato: no SVG, o `y` cresce **para baixo**. Então um valor **alto** (bom!)
+precisa de um `y` **pequeno** (perto do topo). A escala precisa inverter:
+
+```js
+function scaleY(value, min, max, height) {
+  return height - ((value - min) / (max - min)) * height;
+}
+```
+
+Leia por partes: `(value - min) / (max - min)` normaliza o valor para `0..1` (que
+fração do total ele é). Multiplicado por `height`, vira pixels. E o `height -` no
+começo **vira de cabeça para baixo**, para que o maior valor fique no topo. Com
+essa função e um `<polyline>`, você desenha qualquer série de dados.
+
+<Aprofundamento titulo="De pontos a um gráfico animado">
+
+Com a escala pronta, o resto é montagem. Um `<polyline points="x,y x,y ...">`
+desenha a linha ligando os pontos:
+
+```js
+const points = data.map((v, i) => {
+  const x = (i / (data.length - 1)) * width;  // espalha no eixo X
+  const y = scaleY(v, 0, 100, height);         // escala no eixo Y
+  return x + "," + y;
+}).join(" ");
+polyline.setAttribute("points", points);
+```
+
+E para dar vida? Combine com a técnica da lição de `stroke-dasharray`: meça o
+comprimento da polyline com `getTotalLength()`, esconda-a com o `dashoffset`, e
+anime até 0 — o gráfico **se desenha** da esquerda para a direita, como se estivesse
+sendo traçado ao vivo. Some pontos (`<circle>`) que aparecem com um `scale` em
+stagger e você tem uma dataviz autoral, sem uma linha de biblioteca.
+
+Esse é o espírito do módulo inteiro: as ferramentas que você aprendeu (paths,
+escala, dasharray, easing) se combinam em coisas que pareciam exigir bibliotecas
+pesadas. Você não precisa do D3 para uma sparkline — você precisa entender a escala.
+
+</Aprofundamento>
+
+<Dica>
+Para o eixo X com espaçamento uniforme, divida pelo número de **intervalos**
+(`data.length - 1`), não pelo número de pontos. Com 7 pontos há 6 intervalos —
+esse off-by-one é o bug clássico que gruda o último ponto na borda errada.
+</Dica>
+
+<Meta>
+
+Implemente `scaleY(value, min, max, height)` — traduz um valor em coordenada `y`
+(invertida):
+
+- `scaleY(50, 0, 100, 200)` → `100` (o meio)
+- `scaleY(0, 0, 100, 200)` → `200` (mínimo, embaixo)
+- `scaleY(100, 0, 100, 200)` → `0` (máximo, no topo)
+
+Acertando, a demo desenha o gráfico de linha com os seus dados.
+
+</Meta>

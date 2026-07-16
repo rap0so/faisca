@@ -1,0 +1,86 @@
+<Analogia titulo="A diferença entre o chuvisco e as colinas">
+
+Liga uma TV velha sem sinal: aquele chuvisco de pontinhos pretos e brancos pulando
+loucamente. Isso é `Math.random()` puro — cada valor totalmente independente do
+vizinho, um caos elétrico, nervoso, artificial. A natureza **não** é assim. As
+colinas de uma paisagem sobem e descem suavemente; as nuvens têm bordas macias; a
+fumaça ondula. Pontos vizinhos são **parecidos** com seus vizinhos.
+
+Essa é a diferença entre aleatoriedade "elétrica" e aleatoriedade **orgânica**, e a
+ponte entre as duas se chama **Perlin noise** (e sua prima, o simplex noise). Em vez
+de sortear cada ponto do zero, o noise sorteia poucos valores-âncora e **interpola
+suavemente** entre eles — com uma curva especial que elimina os cantos. O resultado
+é aquela aleatoriedade fluida que parece viva: terrenos, texturas de mármore, o
+movimento de tentáculos, fogo, água. E você já viu isso nos shaders que estuda: lá é
+`noise(uv)`, aqui é a mesma ideia em JavaScript. É o ingrediente que separa o
+"gerado por computador" do "parece natural".
+
+</Analogia>
+
+## O coração do noise: a curva `fade`
+
+O segredo da suavidade é **como** você interpola entre os valores-âncora. Uma
+interpolação linear (`lerp`) deixa "quinas" nos pontos de ancoragem. O Perlin usa
+uma curva de suavização, a `fade`, que tem inclinação **zero** nas pontas — então as
+emendas ficam invisíveis:
+
+```js
+// fade(t) = 6t⁵ − 15t⁴ + 10t³   (forma otimizada, sem repetir potências)
+function fade(t) {
+  return t * t * t * (t * (t * 6 - 15) + 10);
+}
+```
+
+`fade(0) = 0`, `fade(1) = 1`, `fade(0.5) = 0.5` — como o `lerp`, ela vai de 0 a 1.
+A diferença é o **caminho**: ela acelera devagar, cruza o meio, e desacelera devagar,
+sem cantos. Troque o `lerp` por `a + (b - a) * fade(f)` na sua interpolação e a
+aleatoriedade instantaneamente vira orgânica.
+
+<Aprofundamento titulo="Value noise, gradient noise e o poder das oitavas">
+
+O que você vai montar na demo é um **value noise** simples (interpolar valores
+aleatórios com a `fade`). O **Perlin** verdadeiro é um pouco mais sofisticado — ele
+interpola **gradientes** (direções) em vez de valores, o que evita certos artefatos
+visuais e dá um resultado ainda mais natural. Mas a ideia central é a mesma:
+âncoras + interpolação suave.
+
+O truque que transforma noise básico em texturas ricas é somar **oitavas**: você
+empilha várias camadas de noise em frequências e amplitudes diferentes —
+
+```js
+let total = 0, amp = 1, freq = 1;
+for (let o = 0; o < 4; o++) {
+  total += noise(x * freq) * amp;
+  freq *= 2;      // cada oitava, o dobro de detalhe
+  amp *= 0.5;     // com metade da força
+}
+```
+
+A primeira oitava dá as grandes colinas; as seguintes adicionam morros, depois
+pedras, depois textura fina. É exatamente assim que se gera terreno de jogo, nuvens
+volumétricas e mármore procedural — a mesma técnica que os shaders de GLSL usam, só
+que aqui na CPU. E como isso pode ficar pesado (muitas oitavas × muitos pixels), é um
+candidato perfeito para a próxima lição: jogar o cálculo num **Web Worker**.
+
+</Aprofundamento>
+
+<Dica>
+Anime o noise passando o tempo como uma das coordenadas: `noise(x, tempo)`. O padrão
+"escorre" suavemente, criando fumaça, chamas e água que fluem. Uma dimensão a mais no
+noise = movimento orgânico de graça.
+</Dica>
+
+<Meta>
+
+Implemente a curva de suavização do Perlin, `fade(t)`:
+
+```js
+fade(t) = t*t*t*(t*(t*6 - 15) + 10)
+```
+
+- `fade(0)` = `0`, `fade(1)` = `1`, `fade(0.5)` = `0.5`
+
+Acertando, a demo desenha um terreno com colinas **suaves** (em vez de picos com
+quinas).
+
+</Meta>

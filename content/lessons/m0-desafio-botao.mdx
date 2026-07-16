@@ -1,0 +1,62 @@
+<Analogia titulo="O interruptor de parede bom">
+
+Um bom interruptor de parede é um pequeno prazer tátil. Ele **convida** o dedo (a
+saliência), **resiste** de leve quando você aperta, faz *clique* e volta. Você nem
+pensa nisso — mas se o interruptor fosse mole, sem resistência e sem clique, você
+sentiria que "tem algo errado", mesmo sem saber dizer o quê.
+
+Um botão na tela não tem corpo físico. Toda essa sensação de "coisa de verdade"
+precisa ser **atuada** com movimento. É o conjunto de estados — repouso, hover,
+press, foco — que transforma um retângulo colorido em algo que parece responder
+ao seu toque. Este é o desafio de fechamento do módulo: juntar tudo que você
+aprendeu num único componente que se sente vivo.
+
+</Analogia>
+
+## Os quatro estados de um botão com alma
+
+- **Repouso** — a base. Calmo, mas com affordance (parece clicável).
+- **`:hover`** — "eu te vejo". Um convite sutil: sobe 1–2px, clareia de leve.
+  Discreto — hover exagerado vira festa cansativa.
+- **`:active`** — o momento do toque. **Afunda** (`scale` < 1). É o feedback
+  tátil falso que seu cérebro lê como "apertou de verdade".
+- **`:focus-visible`** — para quem navega no teclado. Um anel de foco claro. Sem
+  isso, seu botão é invisível para uma parte dos usuários.
+
+E, por cima de tudo, o guard de `prefers-reduced-motion`.
+
+<Aprofundamento titulo="Por que :focus-visible e não :focus">
+
+`:focus` dispara sempre que o elemento recebe foco — inclusive no clique de mouse.
+O problema: muita gente acha o anel de foco "feio" aparecendo a cada clique, e
+acaba escrevendo `outline: none` — quebrando a navegação por teclado para todo
+mundo. Péssimo negócio.
+
+`:focus-visible` é a solução do navegador: ele só aplica o estilo quando o foco
+veio de um jeito que **precisa** de indicação visual — teclado, principalmente —
+e o esconde no clique de mouse. Assim você tem o melhor dos dois mundos: limpo no
+mouse, acessível no teclado. Regra: nunca remova o outline sem oferecer um
+substituto claro via `:focus-visible`.
+
+</Aprofundamento>
+
+<Dica>
+Ordem importa no CSS: declare `:hover`, depois `:active`. E teste de verdade com o
+teclado — dá um `Tab` até o botão e veja se o anel aparece. Se não aparece, ele
+não existe para quem não usa mouse.
+</Dica>
+
+<Meta>
+
+Dê vida ao botão com uma micro-interação **completa**:
+
+1. `transition` na propriedade `transform` (~140ms).
+2. `:hover` — sobe de leve: `translateY(-2px)`.
+3. `:active` — afunda no clique: `scale(0.94)`.
+4. `:focus-visible` — anel de foco visível (um `box-shadow` ou `outline`).
+5. `@media (prefers-reduced-motion: reduce)` — desligue as transições.
+
+Depois de passar nos checks, use a **lista de auto-avaliação** para julgar o
+*gosto* da interação — passar nos testes é o mínimo; parecer delicioso é a meta.
+
+</Meta>

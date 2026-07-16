@@ -1,0 +1,84 @@
+<Analogia titulo="A faísca do isqueiro">
+
+Aperta um isqueiro. Naquele instantinho antes da chama, salta um **buquê de
+faíscas** — dezenas de pontinhos de luz que espirram em todas as direções, cada um
+seguindo seu próprio caminho, brilhando e apagando em menos de um segundo. É
+rápido, é generoso, e é profundamente satisfatório de ver.
+
+Esse é o efeito que você vai construir: o botão de curtir que, ao ser tocado,
+**explode** partículas para fora. É o momento onde tudo deste módulo se junta num
+lugar só — criar elementos em massa, distribuir ângulos com trigonometria, variar
+com aleatoriedade controlada, e limpar a bagunça depois. Não é uma técnica nova;
+é a orquestra de tudo que você já aprendeu, tocando junto. E é exatamente o tipo de
+detalhe que faz uma interface passar de "funciona" para "que gostoso".
+
+</Analogia>
+
+## A receita da explosão
+
+Cada partícula precisa de uma **direção própria**. A trigonometria da lição de
+`sin`/`cos` distribui os ângulos ao redor do círculo:
+
+```js
+for (let i = 0; i < 10; i++) {
+  const angle = (Math.PI * 2 * i) / 10 + Math.random() * 0.4; // espalha + varia
+  const dist = 40 + Math.random() * 40;                        // distâncias variadas
+  const spark = document.createElement("span");
+  spark.className = "spark";
+  spark.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+  spark.style.setProperty("--dy", Math.sin(angle) * dist + "px");
+  like.appendChild(spark);
+  spark.addEventListener("animationend", () => spark.remove()); // varre o confete
+}
+```
+
+O CSS faz o voo, usando as custom properties `--dx`/`--dy` que o JS calculou:
+
+```css
+@keyframes burst {
+  to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+```
+
+Essa divisão de trabalho é elegante: o **JS decide as direções** (a matemática), o
+**CSS executa a animação** (na GPU, de graça). Cada camada faz o que faz de melhor.
+
+<Aprofundamento titulo="Anatomia de um efeito que 'sente bem'">
+
+O que separa uma explosão gostosa de uma sem graça? Três detalhes de *timing* e
+*variação*:
+
+1. **Variação em tudo.** Se todas as partículas têm a mesma distância, ângulo
+   perfeito e tamanho, o efeito parece um relógio — mecânico. O `Math.random()`
+   espalhado nos ângulos e distâncias é o que dá vida orgânica.
+2. **Rápido, mas não instantâneo.** Explosões boas duram ~400–700ms. Rápido o
+   bastante para parecer energia; longo o bastante para o olho acompanhar.
+3. **Saída, não só entrada.** As partículas encolhem (`scale(0.2)`) e somem
+   (`opacity: 0`) ao voar. Sem esse "apagar", elas empilham na tela e o efeito
+   perde a magia — além de entupir o DOM.
+
+E a limpeza (`animationend` → `remove()`) não é frescura: sem ela, cada clique
+deixa dez nós órfãos. Cem cliques e sua página está arrastando dez mil `<span>`
+invisíveis. Efeito bom nasce e **morre** por completo.
+
+</Aprofundamento>
+
+<Dica>
+Combine com o `:active { transform: scale(0.92) }` do botão para dar um "pressiona
+e explode" tátil. Micro-interações se somam: o afundar do clique + o buquê de
+faíscas juntos valem muito mais que cada um sozinho.
+</Dica>
+
+<Meta>
+
+Faça o botão **explodir partículas** ao ser clicado:
+
+1. No listener de clique, crie ~10 `<span class="spark">`.
+2. Para cada um, calcule um ângulo (espalhado no círculo) e uma distância variada.
+3. Defina as custom properties `--dx` e `--dy` com `cos`/`sin × distância`.
+4. `appendChild` no botão e remova cada spark no `animationend`.
+
+Depois de passar nos checks, use o **checklist** para julgar o gosto: as
+partículas variam? o timing é gostoso? some tudo direitinho?
+
+</Meta>

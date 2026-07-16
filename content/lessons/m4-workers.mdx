@@ -1,0 +1,87 @@
+<Analogia titulo="A cozinha com um único chef vs. uma brigada">
+
+Um restaurante com **um só chef** faz tudo em sequência: corta, cozinha, emprata,
+atende. Se um prato exige uma redução que leva 20 minutos mexendo sem parar, **todo
+o resto para** — os outros pratos esperam, os clientes reclamam. É o gargalo de ter
+uma linha de produção única.
+
+O JavaScript do navegador é esse chef solitário: **uma thread** cuida de tudo —
+responder ao clique, animar, calcular. Se você joga um cálculo pesado nela (processar
+uma imagem, gerar noise para um terreno gigante, simular física de dez mil
+partículas), a animação **congela** enquanto isso roda. A tela trava. A solução é
+contratar uma **brigada**: os **Web Workers** são cozinheiros extras rodando em
+threads separadas, que fazem o trabalho pesado **sem travar** o chef principal. E o
+**OffscreenCanvas** deixa esses cozinheiros até **desenharem** por conta própria, num
+canvas fora da tela. É como o Canvas escala para o que seria impossível numa thread só.
+
+</Analogia>
+
+## Trabalho pesado, fora do caminho
+
+Um Worker roda um script isolado e conversa com a página por **mensagens**:
+
+```js
+// thread principal
+const worker = new Worker("heavy.js");
+worker.postMessage({ tarefa: "gerarTerreno", tamanho: 4096 });
+worker.onmessage = (e) => desenhar(e.data); // recebe o resultado pronto
+
+// heavy.js (outra thread)
+onmessage = (e) => {
+  const resultado = calculoPesado(e.data); // trava ESTA thread, não a principal
+  postMessage(resultado);
+};
+```
+
+Como o trabalho costuma ser divisível, um padrão comum é **quebrar em pedaços** e
+distribuir entre vários workers — cada um processa sua parte em paralelo:
+
+```js
+function chunk(array, size) {
+  const out = [];
+  for (let i = 0; i < array.length; i += size) out.push(array.slice(i, i + size));
+  return out;
+}
+```
+
+<Aprofundamento titulo="A fronteira das mensagens: cópia, transfer e OffscreenCanvas">
+
+Workers não compartilham memória com a thread principal (por segurança e sanidade).
+Tudo passa por `postMessage`, e isso tem um custo que você precisa conhecer:
+
+- **Por padrão, os dados são COPIADOS** (structured clone). Mandar um array de 10
+  milhões de números copia os 10 milhões — pode ser mais caro que o cálculo em si.
+- **Transferables** resolvem isso: um `ArrayBuffer` pode ser **transferido** em vez
+  de copiado (`postMessage(buf, [buf])`) — a posse passa para o worker
+  instantaneamente, sem cópia. O buffer fica inutilizável do lado que enviou (você o
+  "entregou"). É a chave para mover imagens e grandes volumes de números de graça.
+
+E a joia da coroa para animação: **OffscreenCanvas**. Você transfere o controle de um
+`<canvas>` para o worker (`canvas.transferControlToOffscreen()`), e então o worker
+pode rodar o **game loop inteiro** — update, draw, tudo — numa thread separada. A
+thread principal fica 100% livre para lidar com scroll, cliques e o resto da UI,
+enquanto milhares de partículas são simuladas e desenhadas em paralelo. É o teto da
+performance em Canvas.
+
+Quando NÃO usar workers? Para trabalho leve, o custo de mensagens e a complexidade não
+compensam — lembre da regra do Módulo 1: **meça primeiro**. Workers são para quando o
+profiler mostra a thread principal estourando o orçamento de 16ms com cálculo pesado.
+
+</Aprofundamento>
+
+<Dica>
+No mundo real, Web Workers em arquivos separados exigem um arquivo `.js` servido — mas
+dá para criar um worker "inline" a partir de um Blob, útil para protótipos. Em
+produção, um bundler cuida disso. Bibliotecas como Comlink escondem o `postMessage`
+atrás de chamadas que parecem funções normais.
+</Dica>
+
+<Meta>
+
+Implemente `chunk(array, size)` — o utilitário que divide o trabalho em pedaços para
+distribuir entre workers:
+
+- `chunk([1, 2, 3, 4, 5], 2)` → `[[1, 2], [3, 4], [5]]`
+- `chunk([1, 2, 3, 4], 2)` → `[[1, 2], [3, 4]]`
+
+</Meta>

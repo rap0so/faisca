@@ -1,0 +1,81 @@
+<Analogia titulo="A régua do tempo que vira a régua da rolagem">
+
+Toda animação tem uma "linha do tempo" — uma régua invisível que vai do começo ao
+fim. Normalmente essa régua é o **relógio**: passam 2 segundos, a animação
+completa. Mas e se, em vez do relógio, a régua fosse a **barra de rolagem**? Aí a
+animação não avança com o tempo — avança conforme você **rola a página**. Rolou a
+metade, a animação está na metade. Rolou de volta, ela volta. Você "arrasta" o
+tempo com o dedo.
+
+Isso costumava exigir JavaScript ouvindo o evento de scroll, calculando
+porcentagens, escrevendo estilos — trabalhoso e cheio de armadilhas de
+performance. O CSS moderno resolveu isso com uma ideia elegante: `animation-timeline`.
+Você troca a régua do relógio pela régua da rolagem com **uma linha de CSS**, e o
+navegador cuida de tudo, de forma suave e otimizada. Barras de progresso de leitura,
+elementos que revelam ao rolar, parallax — tudo isso agora é declarativo.
+
+</Analogia>
+
+## Trocando a régua
+
+```css
+.bar {
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: grow linear;               /* SEM duração! */
+  animation-timeline: scroll(root block); /* a régua é a rolagem */
+}
+@keyframes grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+```
+
+O segredo é o que **falta**: não há `duration`. Quando você liga uma
+`animation-timeline`, a duração deixa de fazer sentido — o progresso da animação
+passa a ser o progresso da régua escolhida. `scroll(root block)` diz "use a rolagem
+vertical (`block`) do elemento raiz (`root`) como minha linha do tempo".
+
+<Aprofundamento titulo="scroll() vs. view(): duas réguas de rolagem">
+
+Existem dois tipos de timeline de rolagem, e escolher o certo é metade do trabalho:
+
+- **`scroll()`** — mapeia o progresso da **barra de rolagem** de um contêiner. É a
+  régua para coisas globais: a barra de progresso de leitura no topo da página, um
+  fundo que muda de cor conforme você desce. "Quanto da página inteira já foi
+  rolado?"
+
+- **`view()`** — mapeia a passagem de **um elemento específico através da tela**.
+  A régua começa quando o elemento entra pela borda de baixo e termina quando sai
+  pela de cima. É a régua para revelar elementos individuais: cada card faz seu fade
+  in conforme **ele** cruza a viewport, independente da rolagem total. "Quanto deste
+  elemento já passou pela tela?"
+
+Você ainda afina com `animation-range` (ex: `entry 0% cover 40%` — anime só durante
+a entrada do elemento). E o pulo do gato de performance: como isso roda no
+compositor do navegador (as mesmas propriedades baratas — `transform`, `opacity`),
+scroll-driven animations em CSS são **muito** mais suaves que a velha abordagem de
+ouvir `scroll` no JavaScript e escrever estilos a cada evento.
+
+Suporte: é recente (Chrome/Edge sólidos; outros chegando). Trate como
+**progressive enhancement** — sem suporte, a barra simplesmente não anima, mas a
+página funciona. Um guard `@supports (animation-timeline: scroll())` deixa isso
+explícito.
+
+</Aprofundamento>
+
+<Dica>
+Combinar com `prefers-reduced-motion` continua valendo. E para revelar vários
+elementos conforme entram, `view()` costuma ser mais natural que `scroll()` — cada
+um anima no seu próprio tempo de tela.
+</Dica>
+
+<Meta>
+
+Faça a barra do topo **preencher conforme a rolagem**, sem JavaScript:
+
+1. Crie um `@keyframes grow` de `scaleX(0)` até `scaleX(1)`.
+2. Aplique `animation: grow linear;` na `.bar` (sem duração).
+3. Ligue à rolagem: `animation-timeline: scroll(root block);`.
+
+</Meta>

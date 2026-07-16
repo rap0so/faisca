@@ -1,0 +1,77 @@
+<Analogia titulo="O girassol que acompanha o sol">
+
+Um girassol passa o dia inteiro virado para o sol. De manhã olha para o leste, ao
+meio-dia para cima, à tarde para o oeste. Ele "sabe" a direção do sol e se orienta
+para ela — um movimento simples que dá uma sensação impressionante de vida e
+atenção.
+
+Fazer um elemento "olhar" para o mouse é dar esse instinto de girassol a ele. Os
+olhos de um personagem que seguem o cursor, uma seta que aponta para onde você vai
+clicar, um farol que varre na sua direção — todos precisam responder à pergunta:
+"**em que ângulo** está o mouse em relação a mim?". A resposta vem de uma função
+com nome estranho e poder enorme: `Math.atan2`. Ela pega a diferença de posição
+(quanto para o lado, quanto para cima/baixo) e devolve o ângulo exato. É a
+trigonometria do Módulo 1 lida de trás para frente: lá você tinha o ângulo e queria
+o ponto; aqui você tem o ponto e quer o ângulo.
+
+</Analogia>
+
+## atan2: de dois pontos para um ângulo
+
+```js
+function angleTo(fromX, fromY, toX, toY) {
+  return (Math.atan2(toY - fromY, toX - fromX) * 180) / Math.PI;
+}
+
+element.addEventListener("pointermove", (e) => {
+  const r = element.getBoundingClientRect();
+  const cx = r.left + r.width / 2;   // centro do elemento
+  const cy = r.top + r.height / 2;
+  const a = angleTo(cx, cy, e.clientX, e.clientY);
+  element.style.transform = "rotate(" + a + "deg)";
+});
+```
+
+Repare na ordem dos argumentos: `atan2(dy, dx)` — **y primeiro**. É a pegadinha
+clássica. Ele devolve radianos, então multiplicamos por `180 / Math.PI` para virar
+graus, que é o que o `rotate()` do CSS quer.
+
+<Aprofundamento titulo="Por que atan2 e não atan? A questão dos quadrantes">
+
+Existe um `Math.atan(dy / dx)` mais simples — então por que `atan2`? Por dois
+motivos que salvam sua sanidade:
+
+1. **Divisão por zero.** Se o mouse está exatamente na vertical (`dx = 0`), `dy / dx`
+   explode. `atan2` recebe `dy` e `dx` separados e lida com isso graciosamente.
+2. **Quadrantes.** `atan(dy/dx)` não consegue distinguir "para a direita e para
+   cima" de "para a esquerda e para baixo" — a divisão perde o sinal. `atan2` recebe
+   os dois sinais e cobre as **quatro** direções, devolvendo o ângulo correto em
+   todo o círculo (-180° a 180°).
+
+É por isso que `atan2` é o padrão universal em jogos, gráficos e robótica para
+"apontar de A para B". Combine-o com o `angleTo` de hoje e o `polarToCartesian` do
+Módulo 2 e você tem o par completo: um converte ângulo → ponto, o outro ponto →
+ângulo. Com esses dois, você navega livremente entre coordenadas cartesianas e
+polares — a base de órbitas, miras, ponteiros e qualquer coisa que gire com
+propósito.
+
+</Aprofundamento>
+
+<Dica>
+Para o elemento apontar a partir do próprio centro, calcule o centro dele com o
+`getBoundingClientRect` da lição anterior (`left + width/2`). "Olhar para o mouse" é
+literalmente `getBoundingClientRect` + `atan2` trabalhando juntos.
+</Dica>
+
+<Meta>
+
+Implemente `angleTo(fromX, fromY, toX, toY)` — o ângulo em **graus** da direção que
+aponta de um ponto ao outro:
+
+- `angleTo(0, 0, 1, 0)` → `0` (direita)
+- `angleTo(0, 0, 0, 1)` → `90` (baixo)
+- `angleTo(0, 0, -1, 0)` → `180` (esquerda)
+
+Acertando, a seta da demo passa a olhar para o seu mouse.
+
+</Meta>

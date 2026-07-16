@@ -1,0 +1,77 @@
+<Analogia titulo="O 'juice' de acertar um golpe">
+
+Nos videogames, existe uma palavra para aquilo que faz um jogo simples parecer
+**delicioso** de jogar: *juice*. É o exagero satisfatório que responde a cada ação.
+Você acerta um inimigo e — não é só ele que some — a tela **treme** um tiquinho, um
+**flash** branco pisca, partículas **espirram**, um número de dano **salta** e sobe,
+o tempo quase congela por um frame. Nenhum desses detalhes é "necessário". Juntos,
+eles transformam um clique num **evento**, e é por isso que você não consegue parar
+de clicar.
+
+Este é o seu primeiro desafio aberto: recriar essa sensação. Você tem todas as
+ferramentas do Módulo 4 — partículas, física, cor, rastro. O que falta agora não é
+técnica, é **acabamento e gosto**: empilhar camadas de feedback até um simples clique
+virar algo que dá vontade de repetir. Não há checks automáticos aqui. O juiz é você
+(e o teste do "cliquei de novo sem perceber").
+
+</Analogia>
+
+## O que empilhar
+
+Um bom efeito de impacto quase nunca é **uma** coisa — é várias, pequenas,
+acontecendo juntas:
+
+- **Partículas** que espirram do ponto de impacto (ângulos em círculo, velocidades e
+  tamanhos variados — a lição de partículas + aleatoriedade controlada).
+- **Física** para elas caírem/desacelerarem com peso (gravidade + atrito).
+- **Rastro** que desvanece (o preenchimento semitransparente no lugar do clear).
+- **Um flash** — um retângulo branco de opacidade alta que some em 2–3 frames.
+- **Screen shake** — deslocar o canvas alguns pixels por alguns frames (um
+  `transform: translate` no elemento, decaindo).
+- **Variação de cor** por golpe, para cada impacto ter identidade.
+
+<Aprofundamento titulo="A arte do 'game feel': camadas, exagero e a curva de decaimento">
+
+O conceito acadêmico por trás do *juice* chama-se **game feel**: a sensação tátil de
+controlar algo na tela. O que os designers de game aprenderam, e que se aplica
+inteiro à sua interface, é que **feedback é multiplicativo, não aditivo**. Uma
+camada (só partículas) é ok. Três camadas modestas (partículas + flash + shake)
+sentem-se dez vezes melhores — porque o cérebro soma os sinais e lê "isso foi
+importante".
+
+Dois princípios guiam o acabamento:
+
+1. **Exagere, depois recue.** Comece com valores exagerados (shake forte, flash
+   intenso, muitas partículas) até o efeito ficar claramente "demais". Aí reduza até
+   o ponto onde ainda sente bom mas não cansa. É muito mais fácil achar o ponto doce
+   descendo do exagero do que subindo da timidez.
+2. **Tudo decai.** Cada camada precisa de uma **curva de saída**: o flash some
+   rápido, o shake diminui a cada frame, as partículas perdem vida. Efeitos que não
+   decaem viram poluição. O `life -= 0.02` e o `globalAlpha = life` do starter são
+   exatamente isso — a morte graciosa que o Módulo 4 pregou.
+
+E o elo com o Módulo 5, que você acabou de fazer: mesmo aqui, no reino do exagero,
+o **bom gosto** manda. Um efeito de hit num jogo de ação pode ser espalhafatoso; o
+mesmo instinto num botão de "salvar" seria insuportável. Juice é contextual — a
+intensidade certa depende de quão frequente e quão importante é a ação. Você está
+treinando o dial, não só o efeito.
+
+</Aprofundamento>
+
+<Dica>
+Screen shake é ridiculamente eficaz e fácil: a cada impacto, guarde uma
+"intensidade" que decai por frame, e no desenho desloque tudo por
+`(Math.random()-0.5)*intensidade`. Duas linhas, e o soco ganha peso. Use com
+moderação — shake demais embrulha o estômago.
+</Dica>
+
+<Meta>
+
+Construa um efeito de **impacto estilo videogame** no canvas. Complete `hit(x, y)`
+e adicione as camadas que quiser — partículas, flash, shake, número de dano. Mire no
+*juice*: empilhe feedback até um clique virar um evento.
+
+Sem gabarito. Quando estiver satisfeito — e clicando de novo sem perceber — use o
+**checklist** e marque como concluída.
+
+</Meta>

@@ -1,0 +1,72 @@
+<Analogia titulo="O teatro e os cenários">
+
+Imagina o navegador montando uma peça de teatro a cada frame. Ele faz três
+coisas, nessa ordem:
+
+1. **Layout** — decide onde cada objeto de cenário fica no palco, quão grande é,
+   o que empurra o quê. É medir e posicionar tudo. **Caro.**
+2. **Paint** — pinta cada cenário: cores, sombras, texturas. **Médio.**
+3. **Composite** — pega os cenários **já pintados** e os desliza pelo palco, em
+   camadas. Como mover um recorte de papelão que já está colorido. **Baratíssimo**
+   — quem faz isso é a GPU.
+
+Aqui está o pulo do gato: `transform` e `opacity` só mexem no passo 3. Você está
+só **deslizando o recorte já pronto**. Já animar `width`, `left` ou `margin` obriga
+o navegador a **remontar o palco inteiro** (layout de novo) a cada frame — 60
+vezes por segundo. É a diferença entre deslizar um cartaz e reconstruir a parede.
+
+</Analogia>
+
+## As duas propriedades "de graça"
+
+Só `transform` e `opacity` conseguem ser animadas puramente no compositor, sem
+disparar layout nem paint. Por isso são as queridinhas de toda animação de
+performance:
+
+```css
+/* CARO: recalcula o layout a cada frame */
+.mover { transition: left 400ms; }
+.mover:hover { left: 180px; }
+
+/* BARATO: só desliza uma camada na GPU */
+.mover { transition: transform 400ms; }
+.mover:hover { transform: translateX(180px); }
+```
+
+Visualmente, os dois parecem quase idênticos. Por baixo, um faz o navegador suar
+e o outro não.
+
+<Aprofundamento titulo="Layout thrashing e por que o jank aparece">
+
+Cada frame tem um orçamento de **~16,7ms** (para 60fps). Se o trabalho de um
+frame estourar esse tempo, o frame é descartado — e você vê o "engasgo" (jank).
+
+Animar propriedades que disparam layout é o caminho mais rápido para estourar
+esse orçamento, porque o layout de um elemento pode forçar o recálculo de vizinhos,
+pais, filhos... um efeito cascata. Pior ainda é o **layout thrashing**: ler uma
+medida (`offsetWidth`) e logo em seguida escrever um estilo, em loop, forçando o
+navegador a recalcular sincronamente várias vezes no mesmo frame.
+
+`transform`/`opacity` escapam disso porque não afetam o fluxo do documento — o
+elemento continua "ocupando" o mesmo espaço no layout; ele só é **desenhado** em
+outro lugar. Por isso um `translateX` nunca empurra os vizinhos, enquanto mudar
+`left`... também não empurra (é `position`), mas ainda passa pela maquinaria de
+layout. `margin` e `width`, aí sim, empurram todo mundo.
+
+</Aprofundamento>
+
+<Dica>
+Ligue o **Paint Flashing** no DevTools (Rendering tab) e anime `width` vs.
+`transform`. Você vai ver a tela piscar de verde quando o navegador repinta —
+e ficar quietinha quando você usa transform. É a prova visual na sua frente.
+</Dica>
+
+<Meta>
+
+O código anima a propriedade `left` — o vilão da performance. Refatore para
+`transform`:
+
+1. Troque a `transition` de `left` para `transform`.
+2. Remova o `left` e, no hover, use `transform: translateX(180px)`.
+
+</Meta>

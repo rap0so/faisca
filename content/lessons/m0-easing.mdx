@@ -1,0 +1,72 @@
+<Analogia titulo="Como as pessoas entram numa sala">
+
+Repara em como pessoas diferentes atravessam uma porta. Um segurança entra com
+passo **firme e constante**, sempre na mesma velocidade — entrou, andou, parou.
+Já uma criança animada **dispara**, passa do ponto onde queria parar e volta um
+pouquinho. E alguém cansado entra **devagar**, ganhando corpo aos poucos.
+
+Mesma distância, mesma porta. O que muda é o **ritmo** — e é o ritmo que te
+conta quem é aquela pessoa. Na web, esse ritmo tem nome: **easing** (ou timing
+function). É a atuação do movimento. Duas animações com a mesma duração podem
+parecer robóticas ou vivas só por causa da curva de easing.
+
+</Analogia>
+
+## As quatro personalidades básicas
+
+- `linear` — velocidade constante do início ao fim. Ótimo para coisas mecânicas
+  (uma barra de progresso, um carrossel automático). Para movimento "natural",
+  quase sempre parece sem graça.
+- `ease-in` — começa devagar e acelera. Bom para coisas **saindo** de cena.
+- `ease-out` — começa rápido e desacelera até parar. Bom para coisas **entrando**
+  (a maioria das entradas na UI usa isso — chega com energia e assenta).
+- `cubic-bezier(...)` — a curva que **você** desenha. Aqui mora a personalidade.
+
+Sente a diferença — é o mesmo trajeto, três ritmos:
+
+<Demo titulo="A mesma viagem, personalidades diferentes">
+  <TransitionDemo />
+</Demo>
+
+## Desenhando sua própria curva
+
+A `cubic-bezier(x1, y1, x2, y2)` define dois "pontos de controle" que puxam a
+curva do tempo. O detalhe mágico: se um `y` passar de `1`, a animação **ultrapassa**
+o destino e volta — é o famoso *overshoot*, que dá aquela sensação de mola viva.
+
+```css
+/* começa, dispara, passa do ponto e assenta */
+transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+```
+
+<Aprofundamento titulo="Por que o 1.56 faz a mágica do overshoot">
+
+Numa `cubic-bezier`, os valores de `x` são o **tempo** (têm que ficar entre 0 e
+1), mas os valores de `y` são o **progresso** — e progresso pode passar de 1.
+
+Quando o segundo ponto de controle tem `y1 = 1.56`, você está dizendo "no meio do
+caminho, finja que já passou de 156% do destino". A curva sobe acima de 1 e
+depois precisa **voltar** para pousar em 1 no final. Esse "subir demais e voltar"
+é exatamente o que seu olho lê como peso, inércia, vida. É física falsa — e
+convincente.
+
+Molas de verdade (spring physics) fazem isso de um jeito ainda mais orgânico;
+você vai implementar uma no Módulo 2.
+
+</Aprofundamento>
+
+<Dica>
+Regra prática: entradas gostam de `ease-out` (chegam e assentam); saídas gostam
+de `ease-in` (juntam energia e somem). Overshoot é tempero — poderoso em pequenas
+doses, enjoativo se estiver em tudo.
+</Dica>
+
+<Meta>
+
+A bolinha cai ao passar o mouse, mas o movimento está sem alma. Dê ritmo a ela:
+
+1. Adicione uma `transition` na propriedade `transform`.
+2. Use duração de **600ms**.
+3. Aplique o easing de overshoot: `cubic-bezier(0.34, 1.56, 0.64, 1)`.
+
+</Meta>

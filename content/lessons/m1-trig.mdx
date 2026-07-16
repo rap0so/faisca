@@ -1,0 +1,64 @@
+<Analogia titulo="A máquina de ondas da piscina">
+
+Sabe aquelas piscinas de parque aquático que fazem ondas? Tem uma máquina no
+fundo que sobe e desce, sobe e desce, num ritmo constante — e isso vira ondas
+que atravessam a piscina inteira. A máquina não sabe o que é "onda". Ela só faz
+uma coisa: **sobe e desce suavemente, para sempre**.
+
+Essa máquina tem um nome matemático: `Math.sin`. Você dá um tempo que só cresce, e
+ela devolve um valor que **oscila entre -1 e 1**, suavemente, sem parar. É a coisa
+mais próxima de "movimento vivo" que existe num número só. Quer algo balançando?
+Pulsando? Flutuando como se boiasse? Respirando? Tudo isso é `sin` disfarçado. E o
+melhor: você já viu isso nos shaders que anda estudando — lá é `sin(u_time)`; aqui
+é `Math.sin(t)`. Mesma máquina de ondas, linguagens diferentes.
+
+</Analogia>
+
+## Seno e cosseno, sem trauma
+
+Esqueça triângulos por um segundo. Pense assim:
+
+- `Math.sin(t)` — uma onda que oscila entre `-1` e `1` conforme `t` cresce.
+- `Math.cos(t)` — a **mesma** onda, só que começando adiantada (no topo).
+
+Para dar amplitude (o quão alto sobe), multiplique: `Math.sin(t) * 50` oscila
+entre `-50` e `50`. Para dar velocidade, escale o tempo: `Math.sin(t * 2)` balança
+mais rápido. É só isso que separa um "flutuar suave" de um "tremer nervoso".
+
+<Aprofundamento titulo="sin + cos = movimento circular (e por que isso importa)">
+
+Aqui está a joia. Use `cos` para o `x` e `sin` para o `y`, com o **mesmo** ângulo,
+e você tem um ponto que anda em **círculo**:
+
+```js
+const x = Math.cos(angle) * radius;
+const y = Math.sin(angle) * radius;
+```
+
+Aumente o `angle` continuamente e o ponto orbita. Esse único padrão te dá:
+planetas girando, partículas explodindo em todas as direções (cada uma com um
+ângulo diferente), um menu radial, ponteiros de relógio, o balanço de um pêndulo.
+
+No desafio deste módulo, você vai usar exatamente isto para lançar partículas em
+todas as direções a partir de um clique: distribua os ângulos ao redor do círculo
+(`Math.PI * 2` é uma volta completa) e cada partícula ganha um `cos`/`sin` de
+direção. Trigonometria deixa de ser prova de escola e vira sua máquina de
+fabricar movimento.
+
+</Aprofundamento>
+
+<Dica>
+Ângulos em JS são em **radianos**, não graus. Uma volta completa é `Math.PI * 2`
+(≈ 6.28), meia volta é `Math.PI`. Para converter graus: `graus * Math.PI / 180`.
+</Dica>
+
+<Meta>
+
+Implemente `oscillate(t)`: retorne o seno de `t` multiplicado por `50` (a
+amplitude). Quando estiver certo, o "surfista" da demo vai subir e descer na sua
+onda — uma prova visual de que funcionou.
+
+- `oscillate(0)` deve ser `0`
+- no pico (`t = π/2`), deve chegar a `50`
+
+</Meta>

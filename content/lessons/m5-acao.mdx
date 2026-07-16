@@ -1,0 +1,81 @@
+<Analogia titulo="O interruptor que responde ao dedo, não à luz">
+
+Pensa em dois jeitos de uma porta automática funcionar. No primeiro, ela só reage
+**depois** que você já passou: você empurra, espera, e num segundo momento a porta
+faz uma animaçãozinha de "abri!". Estranho, atrasado, desconectado do seu gesto. No
+segundo, a porta começa a se mover **no instante** em que você se aproxima,
+acompanhando sua intenção. A segunda parece viva; a primeira, um relatório do que
+aconteceu.
+
+A diferença é sutil e profunda: **animar pela ação do usuário** vs. **animar pela
+mudança de estado**. A maioria das animações de interface é construída "por
+estado": o dado mudou de A para B, então anime a diferença. Funciona, mas
+frequentemente parece **desconectado** — a animação é um comunicado sobre um fato
+consumado. As interfaces que parecem *mágicas* animam pela **ação**: elas respondem
+ao gesto **enquanto ele acontece**, tratando seu dedo (ou cursor, ou scroll) como o
+motor da animação. O movimento não descreve a mudança; ele **é** a mudança
+acontecendo na sua mão.
+
+</Analogia>
+
+## Ação vs. estado, na prática
+
+Pense num item sendo arrastado para deletar:
+
+- **Por estado:** você solta, o app decide "deletado = true", e então toca uma
+  animação de saída. O gesto e a resposta são dois eventos separados.
+- **Por ação:** o item segue seu dedo em tempo real; conforme você arrasta, ele
+  revela o fundo vermelho, fica mais transparente, talvez trema um pouco perto do
+  limite. A decisão de deletar **emerge** do gesto, e você sente o controle o tempo
+  todo. Pode até desistir no meio — porque a animação estava **atada à sua ação**,
+  não a um estado já decidido.
+
+O primeiro usa o que você aprendeu de `transition` e `@keyframes`. O segundo usa o
+que aprendeu no Módulo 3: `pointermove`, `getBoundingClientRect`, valores
+normalizados `0..1`, o cursor como fonte de verdade.
+
+<Aprofundamento titulo="Interruptibilidade, direct manipulation e por que springs vencem">
+
+O princípio por trás disso tem nome na pesquisa de interfaces: **direct
+manipulation**. Quanto mais direta a ligação entre o gesto do usuário e a resposta
+visual, mais o usuário sente que está **manipulando o objeto real**, não emitindo
+comandos para um sistema distante. É a diferença entre "empurrar uma gaveta" e
+"pedir para a gaveta se abrir".
+
+Três consequências práticas para suas animações:
+
+1. **Interruptibilidade é obrigatória.** Se a animação está atada à ação, o usuário
+   pode mudar de ideia no meio — e a interface precisa acompanhar. É exatamente por
+   isso que **springs vencem durações** (Módulo 2): uma mola redireciona
+   suavemente quando o alvo muda; uma animação de `duration` fixa dá um "pulo" feio
+   se interrompida.
+2. **Mapeie o gesto ao efeito de forma contínua.** Não espere o `pointerup` para
+   reagir — leia o `pointermove` e mapeie a posição a um valor visual em tempo real.
+   O card do desafio do Módulo 3 (tilt seguindo o cursor) já era isso.
+3. **Nem tudo precisa ser assim.** Ação-dirigida brilha para gestos diretos
+   (arrastar, deslizar, puxar-para-atualizar, hover). Para eventos que **não** são
+   gestos — um dado que chegou do servidor, uma notificação — animar por estado é o
+   certo. O julgamento é: *isto é uma resposta a um gesto contínuo do usuário?* Se
+   sim, ate a animação ao gesto. Se não, uma boa animação de estado basta.
+
+Este é o pulo de qualidade que leva uma interface de "polida" para "viva". E é
+quase invisível quando bem-feito — o usuário não pensa "que animação legal", ele
+pensa "nossa, que gostoso de usar", sem saber por quê.
+
+</Aprofundamento>
+
+<Dica>
+Um teste rápido para saber se uma animação deveria ser por ação: **você consegue
+'segurá-la no meio'?** Se arrastar um menu até a metade e parar deixa ele
+sensatamente na metade, é ação-dirigida. Se ele só liga/desliga com uma animação
+fixa, é estado. Gestos diretos quase sempre querem o primeiro.
+</Dica>
+
+<Meta>
+
+Reflita sobre interfaces que você usa: quais respondem ao seu **gesto** (seguem o
+dedo, o cursor, o scroll) e quais só tocam uma animação **depois** que você agiu?
+Sinta a diferença de "vivacidade" entre elas. Marque como concluída quando a
+distinção ação vs. estado estiver nítida na sua cabeça.
+
+</Meta>

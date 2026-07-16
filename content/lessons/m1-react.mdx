@@ -1,0 +1,79 @@
+<Analogia titulo="Ligar o gás e lembrar de desligar">
+
+Quando você acende o fogão para cozinhar, existe uma regra não escrita: **lembre
+de desligar depois**. Ligar sem desligar é como acidentes acontecem. Todo processo
+que você inicia — o gás, uma torneira, um timer — carrega junto a responsabilidade
+de encerrá-lo quando não precisa mais.
+
+Animações em React são exatamente isso. Um loop de `requestAnimationFrame` é um
+"gás ligado": ele roda para sempre. Se o componente que iniciou o loop sair da
+tela (o usuário mudou de página) e ninguém **desligou** o loop, ele continua
+queimando CPU no vazio — tentando animar um elemento que nem existe mais. React te
+dá o lugar certo para "desligar o gás": a função de **cleanup** que você retorna
+de um `useEffect`. Dominar animação em React é, no fundo, dominar o começar-e-parar
+com disciplina.
+
+</Analogia>
+
+## Os três hábitos de animar em React
+
+```jsx
+function useRaf(onFrame) {
+  useEffect(() => {
+    let id = requestAnimationFrame(function loop() {
+      onFrame();
+      id = requestAnimationFrame(loop);
+    });
+    // o "desligar o gás": roda quando o componente sai
+    return () => cancelAnimationFrame(id);
+  }, []);
+}
+```
+
+1. **Cleanup sempre**: todo loop, listener ou timer iniciado num `useEffect`
+   precisa ser encerrado no `return`.
+2. **`useRef` para valores que mudam a cada frame**: posição, velocidade — guarde
+   em refs, não em `useState`, senão você força um re-render 60 vezes por segundo.
+3. **Evite re-renders desnecessários**: anime via refs e estilos diretos; deixe o
+   React fora do loop quente.
+
+<Aprofundamento titulo="Por que useState no loop de animação é uma armadilha">
+
+Parece natural: "a posição muda, então é estado, então `useState`". Mas cada
+`setState` agenda um **re-render** — o React reconstrói o componente, compara a
+árvore, aplica mudanças. Fazer isso a 60fps é jogar trabalho no lixo: você não
+quer re-renderizar o componente inteiro, quer só mexer numa propriedade `style`.
+
+O padrão certo: guarde o que muda a cada frame numa `useRef` (que **não** dispara
+re-render ao mudar) e escreva direto no DOM via `ref.current.style.transform`. O
+React nem fica sabendo — e é exatamente o que você quer no loop quente.
+
+E quando um componente filho recebe props e você quer evitar que ele
+re-renderize à toa? Aí entra a **comparação rasa** (`shallow compare`), o coração
+do `React.memo`: se as props têm os mesmos valores nas mesmas chaves, pule o
+re-render. É esse pedacinho de lógica que você vai implementar agora — a mesma
+ideia que o React usa por baixo para decidir "mudou de verdade ou é o mesmo
+conteúdo num objeto novo?".
+
+</Aprofundamento>
+
+<Dica>
+`useRef` é seu melhor amigo para animação em React: além de guardar o nó do DOM
+(`ref={meuRef}`), ele guarda **qualquer** valor mutável que deva sobreviver entre
+frames sem causar re-render. Pense nele como uma "caixa" que persiste.
+</Dica>
+
+<Meta>
+
+Implemente `shallowEqual(a, b)` — o coração da otimização de re-renders:
+
+- retorna `true` se `a` e `b` têm as **mesmas chaves com os mesmos valores**;
+- retorna `false` se algum valor difere ou se o número de chaves difere.
+
+```js
+shallowEqual({ x: 1 }, { x: 1 })       // true
+shallowEqual({ x: 1 }, { x: 2 })       // false
+shallowEqual({ x: 1 }, { x: 1, y: 2 }) // false
+```
+
+</Meta>

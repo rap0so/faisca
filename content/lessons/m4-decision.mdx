@@ -1,0 +1,81 @@
+<Analogia titulo="Três ferramentas na bancada do marceneiro">
+
+Um bom marceneiro não usa a mesma ferramenta para tudo. Para um corte reto e limpo,
+a serra circular. Para um encaixe delicado, o formão. Para lixar uma superfície
+grande, a lixadeira orbital. Usar o formão para lixar seria absurdo — não porque o
+formão seja ruim, mas porque **cada ferramenta tem seu ponto forte**. A maestria não
+está em dominar uma ferramenta, mas em **saber qual pegar** para cada trabalho.
+
+Na web, você tem três ferramentas para colocar coisas na tela: **DOM**, **SVG** e
+**Canvas**. Não existe a "melhor" — existe a **certa para o caso**. E depois de
+quatro módulos, você finalmente conhece as três por dentro o suficiente para
+escolher com sabedoria. Esta lição não tem código para escrever; ela tem um mapa
+mental para construir — a árvore de decisão que vai te guiar em todo projeto de
+animação daqui para frente.
+
+</Analogia>
+
+## A árvore de decisão
+
+**Comece pela pergunta que mais elimina opções: quantos objetos, e eles se movem?**
+
+- **DOM (HTML + CSS)** — sua escolha padrão. Poucos elementos, com **texto,
+  interação e acessibilidade** que vêm de graça (foco, leitores de tela, seleção,
+  eventos). Botões, cards, menus, modais, a maioria das micro-interações que você
+  fez até aqui. Rápido de desenvolver, acessível por natureza. O CSS moderno
+  (scroll-driven, view transitions) cobre muito mais do que se imagina.
+
+- **SVG** — quando você precisa de **gráficos vetoriais nítidos e ainda quer
+  elementos** (cada forma é um nó que você pode estilizar, animar e clicar).
+  Ícones, logos, ilustrações, gráficos de dados **interativos**, qualquer coisa que
+  precise escalar sem perder qualidade e responder a hover/clique por forma. É o meio-termo:
+  a nitidez do vetor com a conveniência dos elementos.
+
+- **Canvas** — quando há **muitos** objetos (centenas, milhares) e/ou **pixels
+  crus** (manipular imagens, efeitos de partículas, jogos, visualizações densas). É
+  o mais rápido para volume, mas é **"cego"**: não há elementos, então você perde
+  acessibilidade, eventos por forma e seleção — tudo isso vira sua
+  responsabilidade. Poder bruto em troca de conveniência.
+
+<Aprofundamento titulo="Os trade-offs por baixo, e por que a resposta às vezes é 'os três'">
+
+Cada ferramenta faz um trato diferente entre **conveniência** e **poder/escala**:
+
+| | DOM | SVG | Canvas |
+|---|---|---|---|
+| Cada coisa é um **elemento**? | sim | sim | **não** (só pixels) |
+| Acessibilidade nativa | ótima | boa | **você faz na mão** |
+| Escala (nº de objetos) | baixa | média | **altíssima** |
+| Nitidez ao escalar | ok | **vetorial** | depende da resolução |
+| Manipular pixels | não | não | **sim** |
+
+O ponto de virada mais comum: **quantos objetos animados?** Dezenas → DOM/SVG
+tranquilo. Centenas → SVG começa a suar. Milhares → só Canvas segura 60fps. Foi por
+isso que os efeitos de partículas migraram do DOM (Módulo 1) para o Canvas (este
+módulo): a escala explodiu.
+
+E a verdade dos projetos reais: muitas vezes a resposta é **combinar**. Uma
+visualização de dados pode ter o **Canvas** desenhando dez mil pontos no fundo, um
+**SVG** por cima com os eixos e rótulos nítidos, e **DOM** para os tooltips
+acessíveis e os controles. Cada camada faz o que faz de melhor. Saber escolher — e
+saber **misturar** — é a marca de quem realmente domina animação na web. É por isso
+que este módulo fecha com um mapa, não com mais um efeito: a técnica sem o
+julgamento é só um martelo à procura de pregos.
+
+</Aprofundamento>
+
+<Dica>
+Regra de bolso para decidir rápido: **precisa de acessibilidade e são poucos? DOM.
+Precisa de vetor nítido e interativo? SVG. São milhares ou é pixel puro? Canvas.**
+Na dúvida entre DOM e Canvas, comece no DOM — só migre para Canvas quando o profiler
+provar que você precisa.
+</Dica>
+
+<Meta>
+
+Esta lição é de **julgamento**, não de código. Leia a árvore de decisão, pense em
+projetos que você já fez (ou no AnimatedOdds) e em qual ferramenta cada parte pediria.
+Depois, use a auto-avaliação abaixo para confirmar que o mapa mental ficou de pé — e
+marque como concluída quando as ideias estiverem claras.
+
+</Meta>

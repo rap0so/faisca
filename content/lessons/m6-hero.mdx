@@ -1,0 +1,81 @@
+<Analogia titulo="A vitrine da loja de grife">
+
+Passe em frente a uma loja de grife e repare na vitrine. Ela não tem **tudo** o que
+a loja vende empilhado no vidro — tem **uma** peça, iluminada, num pedestal, com
+todo o resto quieto ao redor para que seu olho vá direto a ela. É a contenção que
+comunica sofisticação: uma coisa dita com força, o resto em silêncio.
+
+Um hero de landing page de startup é a vitrine do produto. E o erro mais comum é
+tratá-lo como uma árvore de Natal — tudo pisca, tudo se move, tudo compete por
+atenção, e o resultado grita "amador". O hero que parece **caro** faz o oposto: tem
+**uma** assinatura de movimento forte (um blob que respira, um gradiente que flui,
+uma forma que reage ao cursor) e deixa o texto entrar com elegância e calma. Este
+desafio é sobre disciplina tanto quanto sobre técnica — é onde tudo que você
+aprendeu encontra o bom gosto do Módulo 5.
+
+</Analogia>
+
+## A anatomia de um hero que respira
+
+O starter te dá um esqueleto: um blob SVG com gradiente, um título, um subtítulo e um
+CTA. Sua missão é dar vida com **restrição**:
+
+- **A assinatura** — o elemento SVG é o astro. Faça-o **respirar**: uma rotação
+  lenta e contínua, uma leve pulsação de escala, ou uma deformação sutil do path.
+  Bônus: faça-o reagir ao cursor (o `getBoundingClientRect` + normalização do Módulo
+  3), inclinando-se de leve na direção do mouse.
+- **O texto** — entra com **hierarquia**: o título primeiro, o subtítulo logo depois,
+  o CTA por último. Um stagger sutil (Módulo 5) de ~80ms transforma "apareceu" em
+  "foi apresentado".
+- **O CTA** — uma micro-interação discreta no hover/press (Módulo 0). Ele é o destino
+  da jornada; deve convidar sem gritar.
+
+<Aprofundamento titulo="A regra do 'uma assinatura' e a orquestração da entrada">
+
+O princípio que separa heroes profissionais de amadores tem um nome que vale levar
+para a carreira: **uma assinatura, o resto quieto**. Isto é exatamente a filosofia
+de design desta própria plataforma (o anel de progresso vivo, com o resto discreto).
+A ideia: escolha **um** momento de movimento memorável e invista nele; deixe todo o
+resto sóbrio. Duas assinaturas competem e se anulam; uma, sustentada, vira
+identidade.
+
+Para a entrada, orquestre com intenção (Módulo 5):
+
+```
+título     →  entra em 0ms      (o mais importante, primeiro)
+subtítulo  →  entra em ~120ms    (contexto, logo depois)
+CTA        →  entra em ~240ms    (a ação, por último — o olho já foi guiado até ela)
+```
+
+Esse escalonamento não é decoração: ele **dirige a leitura**. O olho pousa no título,
+desce para o subtítulo, e chega ao CTA no momento em que já entendeu a proposta —
+exatamente quando está pronto para agir. Você não está só animando; está coreografando
+a primeira impressão.
+
+E o acabamento profissional: performance impecável (só `transform`/`opacity` — Módulo
+1), `prefers-reduced-motion` desligando os movimentos (Módulo 0), e a assinatura
+contínua (a respiração do blob) suave o bastante para não distrair de quem está lendo.
+Movimento perpétuo na periferia é traiçoeiro — sutil demais é invisível, forte demais
+cansa. Achar esse fio é o trabalho.
+
+</Aprofundamento>
+
+<Dica>
+Blobs orgânicos ficam ótimos com uma animação de `border-radius`/path lenta e um giro
+de poucos graus — a combinação dá a sensação de "vida líquida". Ferramentas de
+blob-maker geram o path; você anima. Mantenha a duração longa (8–20s) para respirar,
+não tremer.
+</Dica>
+
+<Meta>
+
+Transforme o esqueleto num **hero de landing "tech startup"** com personalidade:
+
+1. Dê ao SVG uma **assinatura** de movimento (respirar, girar devagar, reagir ao
+   cursor).
+2. Faça o texto entrar com **hierarquia** (stagger título → subtítulo → CTA).
+3. Micro-interação no CTA; performance e `prefers-reduced-motion` cuidados.
+
+Mire em "produto real", não em "festa". Use o **checklist** e marque como concluída.
+
+</Meta>

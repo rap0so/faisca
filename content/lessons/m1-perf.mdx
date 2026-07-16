@@ -1,0 +1,77 @@
+<Analogia titulo="O garçom que anota vs. o que corre à toa">
+
+Dois garçons atendem uma mesa grande. O primeiro escuta **todos** os pedidos,
+anota, e vai à cozinha **uma vez**. O segundo corre até a cozinha a cada pedido
+individual — dez viagens para dez pratos. Mesmo resultado, mas o segundo se esgota
+e o serviço engasga. O trabalho não era o problema; o **desperdício de idas e
+vindas** era.
+
+Performance de animação é a mesma história. Frames engasgam não porque o navegador
+é lento, mas porque a gente o faz correr à toa: recalcular layout que não mudou,
+repintar o que já estava pintado, ler e escrever no DOM em pingue-pongue. A boa
+notícia: o navegador tem uma "cozinha com câmeras" — o DevTools — que mostra
+exatamente onde ele está suando. Você não otimiza no escuro; você **mede**, vê o
+gargalo, e corrige aquilo.
+
+</Analogia>
+
+## As ferramentas que revelam o invisível
+
+- **Rendering → Paint flashing**: pinta de verde tudo que o navegador **repinta**.
+  Anime `transform` e a tela fica quieta; anime `box-shadow` e ela pisca de verde
+  sem parar. Diagnóstico visual instantâneo.
+- **Rendering → Frame Rendering Stats** (ou o medidor de FPS): mostra a taxa real.
+  Se cair de 60, algo está estourando o orçamento de ~16ms por frame.
+- **Performance tab**: grava alguns segundos e mostra a linha do tempo — quanto
+  tempo foi para Script, Layout (roxo), Paint (verde). Barras vermelhas no topo =
+  frames perdidos. É aqui que você caça o vilão.
+
+## O gesto de otimização mais comum
+
+```css
+.box {
+  transition: transform 500ms ease;
+  will-change: transform; /* "navegador, prepara a camada — vou animar isto" */
+}
+```
+
+`will-change` avisa o navegador para promover o elemento a uma **camada própria**
+na GPU *antes* da animação começar, evitando um engasgo no primeiro frame.
+
+<Aprofundamento titulo="will-change é uma promessa, não um feitiço">
+
+É tentador jogar `will-change: transform` em tudo. Não faça. Cada camada
+promovida consome **memória de GPU**, e promover o mundo inteiro pode deixar a
+página mais lenta, não mais rápida — o oposto do que você queria.
+
+Use com parcimônia e intenção:
+
+1. **Aplique pouco antes** de animar (por exemplo, no `:hover` do container) e
+   **remova depois**, para o navegador liberar a camada.
+2. Prefira deixar o navegador decidir sozinho quando possível — ele já promove
+   automaticamente elementos que estão animando `transform`/`opacity`.
+3. Se você tem `will-change` fixo em dezenas de elementos, é quase certo que está
+   piorando as coisas.
+
+A regra de ouro de performance continua a mesma das lições anteriores: anime
+`transform` e `opacity`, evite `width`/`top`/`box-shadow` em loop, e **meça antes
+de otimizar**. Otimização por palpite costuma resolver o problema errado.
+
+</Aprofundamento>
+
+<Dica>
+Abra o DevTools desta lição (F12 → aba Rendering → ligue "Paint flashing") e passe
+o mouse no quadrado. Depois troque a animação para `box-shadow` e veja a diferença
+de piscadas. Ver o problema é metade de resolvê-lo.
+</Dica>
+
+<Meta>
+
+O movimento já usa `transform` (ótimo). Agora prepare o navegador para ele:
+
+1. Adicione `will-change: transform;` na `.box`.
+
+(Simples de propósito — o conteúdo desta lição é aprender a **enxergar** a
+performance no DevTools, não decorar propriedade.)
+
+</Meta>

@@ -1,0 +1,69 @@
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-4) var(--sp-6);
+  border-bottom: 1px solid var(--line-soft);
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.mark {
+  transition: transform var(--dur-med) var(--ease-spring);
+}
+.brand:hover .mark {
+  transform: rotate(18deg) scale(1.12);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-left: auto;
+}
+
+.link {
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-pill);
+  color: var(--text-dim);
+  font-size: 0.925rem;
+  font-weight: 500;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.link:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.link[data-active] {
+  color: var(--spark);
+  background: var(--spark-soft);
+}
+
+@media (max-width: 640px) {
+  .nav {
+    padding: var(--sp-3) var(--sp-4);
+    gap: var(--sp-3);
+  }
+  .link {
+    padding: var(--sp-2);
+    font-size: 0.85rem;
+  }
+}

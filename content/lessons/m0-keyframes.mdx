@@ -1,0 +1,68 @@
+<Analogia titulo="O flipbook do seu caderno">
+
+Lembra de desenhar bonequinhos no canto das páginas do caderno e passar rápido
+pra virar animação? Você não desenhava **todos** os quadros de um pulo. Você
+desenhava as **poses-chave**: agachado, no ar, aterrissando. Os quadros do meio
+seu olho preenchia sozinho.
+
+Uma `transition` só sabe ir do estado A ao estado B — é um flipbook de duas
+páginas. Quando você precisa de mais poses no caminho (agachar → subir → cair →
+quicar), a ferramenta certa é `@keyframes`: você desenha as poses-chave em
+porcentagens do tempo (`0%`, `50%`, `100%`), e o navegador tweena o resto.
+
+</Analogia>
+
+## Anatomia de uma animação
+
+São duas partes que trabalham juntas:
+
+```css
+/* 1. As poses-chave, com um nome */
+@keyframes pulse {
+  50% {
+    transform: scale(1.4);
+    opacity: 0.5;
+  }
+}
+
+/* 2. Aplicar a animação a um elemento */
+.dot {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+```
+
+Repara que só declarei o `50%`. O navegador assume que `0%` e `100%` são o estado
+atual do elemento — então a animação sai do normal, incha no meio, e volta.
+Fechar o ciclo no mesmo ponto é o que faz o loop parecer contínuo.
+
+<Aprofundamento titulo="transition vs. animation: quando usar cada uma">
+
+- **`transition`**: reativa. Precisa de uma mudança de estado para disparar
+  (`:hover`, uma classe adicionada via JS). É perfeita para "isto muda quando o
+  usuário faz aquilo". Vai do valor atual ao novo, uma vez.
+
+- **`animation`** (`@keyframes`): proativa e autônoma. Roda sozinha assim que
+  aplicada, pode ter várias poses, repetir (`infinite`), inverter (`alternate`),
+  atrasar (`animation-delay`) e pausar (`animation-play-state`).
+
+Regra de bolso: se o movimento responde a uma ação, comece com `transition`. Se
+ele é uma qualidade contínua do elemento (um pulso, um shimmer, um giro de
+loading), use `@keyframes`.
+
+</Aprofundamento>
+
+<Dica>
+`animation-iteration-count: infinite` deixa rodando pra sempre. Ótimo para
+loaders — mas cuidado: movimento infinito na periferia da tela cansa. Se for
+decorativo, considere parar depois de algumas repetições.
+</Dica>
+
+<Meta>
+
+Faça o ponto verde **pulsar** para sempre:
+
+1. Crie um `@keyframes` chamado `pulse`.
+2. No meio (`50%`), aumente a escala para `1.4` e reduza a opacidade.
+3. Aplique na `.dot`: duração `1.5s`, repetindo `infinite`.
+
+</Meta>

@@ -1,0 +1,95 @@
+<Analogia titulo="A noite de Ano-Novo no céu">
+
+Fogos de artifício são pura emoção coletiva: aquele silêncio de expectativa, o
+sopro subindo, e então — **buquê!** — a explosão se abre em mil faíscas coloridas
+que descem lentamente, brilhando, cada uma seguindo seu caminho antes de se apagar.
+Ninguém desenhou aquele padrão; ele **acontece** a partir de regras simples:
+partículas lançadas em todas as direções, a gravidade puxando, a luz desvanecendo.
+
+Este é o desafio de fechamento do Módulo 4 — e ele junta **absolutamente tudo** que
+você aprendeu no curso inteiro. O game loop do Canvas (limpar, atualizar, desenhar).
+A trigonometria que espalha as faíscas em círculo. A física que aplica gravidade. A
+aleatoriedade controlada nas cores e velocidades. O rastro que desvanece. O
+gerenciamento de partículas em escala. É a sua orquestra tocando a sinfonia
+completa. E o melhor: fogos procedurais são a celebração que a própria plataforma
+usa — você está construindo a peça que comemora suas conquistas.
+
+</Analogia>
+
+## A anatomia de uma explosão
+
+Cada `burst` cria dezenas de partículas no ponto de origem, com velocidades
+distribuídas em círculo, uma cor comum e uma "vida" que decai:
+
+```js
+function burst(x, y) {
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  for (let i = 0; i < 40; i++) {
+    const angle = (Math.PI * 2 * i) / 40;     // espalha no círculo (trig)
+    const speed = 1 + Math.random() * 3;       // velocidade variada (random)
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      color,
+      life: 1,                                 // 1 = vivo, 0 = morto
+    });
+  }
+}
+```
+
+E o loop dá vida a elas: gravidade puxa (`vy += 0.05`), a vida decai
+(`life -= 0.01`), a opacidade segue a vida (`globalAlpha`), e um preenchimento
+semitransparente cria o rastro. Partículas mortas são filtradas para fora — o
+"varrer o confete" do Módulo 1, agora no Canvas.
+
+<Aprofundamento titulo="Os detalhes que separam 'pontinhos' de 'fogos de verdade'">
+
+A mecânica é simples; a **magia** está em quatro detalhes de acabamento:
+
+1. **O rastro que desvanece.** Em vez de `clearRect`, pinte o fundo com
+   `rgba(14,15,20,0.25)` a cada frame. Cada faísca deixa um trilho que some
+   suavemente — sem isso, os fogos parecem pontinhos secos pulando; com isso, viram
+   riscos de luz. É o detalhe que mais entrega "uau" por menos código.
+
+2. **A opacidade ligada à vida.** `ctx.globalAlpha = p.life` faz cada faísca
+   **apagar gradualmente** conforme morre, em vez de sumir de repente. A morte suave
+   é o que dá a sensação de brasa esfriando.
+
+3. **Gravidade sutil.** Um `vy += 0.05` bem pequeno faz as faíscas descreverem
+   aquele arco melancólico de cair. Forte demais e elas despencam como pedras; na
+   medida certa, flutuam antes de tombar.
+
+4. **Cor por explosão, não por partícula.** Todas as faíscas de um mesmo buquê
+   compartilham a cor — é assim que fogos reais funcionam, e o cérebro lê cada
+   explosão como um evento único e coeso.
+
+Repare que os checks automáticos só verificam a **mecânica** (o canvas pinta, o loop
+roda). Se os fogos ficam **bonitos** — se o rastro respira, se a gravidade parece
+certa, se as cores agradam — isso é o **checklist**, e é o julgamento que só você
+pode fazer. Como em todo o curso: os testes garantem que funciona; o gosto é seu. E
+este é o momento de sentir orgulho: você saiu de "o que é uma transition" e chegou a
+um sistema de partículas procedural completo. Isso é domínio.
+
+</Aprofundamento>
+
+<Dica>
+Para dar um passo além do checklist: adicione um brilho com
+`ctx.shadowBlur = 8; ctx.shadowColor = p.color` antes de desenhar cada faísca — elas
+ganham um halo que faz o efeito parecer luz de verdade. Custa performance, então use
+com consciência (Módulo 1!), mas o resultado é lindo.
+</Dica>
+
+<Meta>
+
+Faça os fogos **explodirem** a cada clique no canvas:
+
+1. Complete `burst(x, y)`: crie ~40 partículas com ângulos distribuídos em círculo
+   (`Math.PI * 2 * i / 40`), velocidade variada, uma cor comum e `life: 1`.
+2. Adicione cada uma ao array `particles` (o loop já cuida de atualizar, desenhar e
+   remover as mortas).
+
+Depois dos checks, use o **checklist** para julgar se os fogos ficaram gostosos de
+ver — e comemore: você fechou o Módulo 4. 🎆
+
+</Meta>

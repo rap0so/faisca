@@ -1,0 +1,78 @@
+<Analogia titulo="O aperto de mão que combina com a pessoa">
+
+Um bom aperto de mão diz algo sobre quem você é. O vendedor tem um firme e
+enérgico; o artista, um mais leve; o avô, um caloroso e demorado. Não existe "o
+aperto de mão certo" universal — existe o que **combina com a personalidade**.
+
+Ícones são iguais. Uma micro-interação genérica (tudo dá o mesmo `scale` no hover)
+é como todo mundo apertando a mão igual: funciona, mas é sem alma. A mágica está em
+dar a **cada ícone o gesto que combina com o que ele significa**: o de download
+faz a seta **descer** (como o arquivo baixando), o de link externo **sai voando**
+para fora (como abrindo em outro lugar), a varinha mágica **gira** com um floreio.
+O movimento vira uma extensão do significado. Este é o desafio de fechamento do
+módulo: três ícones, três personalidades, todo o SVG que você aprendeu a serviço do
+detalhe que faz sorrir.
+
+</Analogia>
+
+## Gestos que significam
+
+```css
+.icon {
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1), color 200ms ease;
+  transform-origin: center;
+}
+.icon:hover { color: #ffb03a; }
+
+.icon-download:hover svg { transform: translateY(3px); }   /* baixa */
+.icon-external:hover svg { transform: translate(2px, -2px); } /* sai */
+.icon-wand:hover svg    { transform: rotate(-12deg); }       /* encanta */
+```
+
+Repare que a **cor** também muda no hover — feedback redundante é feedback robusto.
+E, crucialmente, o guard de `prefers-reduced-motion`: quem pediu menos movimento
+ainda recebe o feedback de cor, só que sem o deslocamento.
+
+<Aprofundamento titulo="Redundância de feedback e a coerência do módulo">
+
+Um princípio de acessibilidade que amarra tudo: **nunca dependa de um único canal
+de feedback**. Se a única pista de que o ícone reagiu é o movimento, então para
+quem tem `prefers-reduced-motion` ligado — ou para quem simplesmente não percebeu o
+gesto rápido — não houve feedback nenhum. Por isso combinamos **movimento + cor**:
+desligue um, o outro segura.
+
+Esse desafio é, de propósito, uma retrospectiva do módulo inteiro:
+
+- **Paths** (Lição 2) desenharam cada ícone.
+- **transform-origin** (Lição 4) garante que giros e escalas girem no lugar certo.
+- **Easing com overshoot** (Módulo 0) dá o saltinho vivo.
+- **prefers-reduced-motion** (Módulo 0) mantém tudo acessível.
+
+E os checks automáticos verificam a mecânica (os ícones existem, têm transition,
+a varinha gira, há o guard). Mas a parte que os testes **não** medem — o *gosto*, se
+cada gesto realmente combina com o significado, se está discreto o bastante — é o
+que a lista de auto-avaliação te convida a julgar. Passar nos testes é o chão;
+parecer delicioso é o teto.
+
+</Aprofundamento>
+
+<Dica>
+Anime o `svg` de dentro do botão (`.icon svg`), não o botão inteiro — assim o botão
+fica firme como alvo de clique enquanto só o desenho se mexe. Separar "o alvo" do
+"o que anima" é um truque recorrente de micro-interações bem-feitas.
+</Dica>
+
+<Meta>
+
+Dê a cada um dos três ícones uma micro-interação com **personalidade própria**:
+
+1. Todos: `transition` em `transform` e `transform-origin: center`.
+2. `.icon-download` no hover: a seta desce (`translateY`).
+3. `.icon-external` no hover: o ícone sai na diagonal (`translate`).
+4. `.icon-wand` no hover: a varinha gira (`rotate`).
+5. Um guard de `prefers-reduced-motion` desligando os deslocamentos.
+
+Depois dos checks, use o **checklist** para julgar se cada gesto realmente combina
+com o significado do ícone.
+
+</Meta>

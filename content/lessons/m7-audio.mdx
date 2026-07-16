@@ -1,0 +1,109 @@
+<Analogia titulo="O medidor que dança na aparelhagem de som">
+
+Você já viu aqueles medidores nas aparelhagens de som antigas — as barrinhas de LED
+que **saltam** com a batida, mais altas nos graves fortes, tremendo nos agudos? Elas
+não estão só enfeitando: estão **traduzindo o som em altura**. O grave bate, a barra
+sobe; o silêncio, ela cai. O som, que é invisível, ganha um corpo visual que
+**dança junto**.
+
+Fazer isso na web é o auge do whimsy: transformar música em movimento. E a chave é
+a **Web Audio API**, especificamente um nó chamado **AnalyserNode**. Ele fica no
+meio do caminho do áudio e, a cada frame, te entrega um **array de números** —
+o "retrato" do som naquele instante. Você lê esse array e mapeia para o visual:
+barras que sobem, um círculo que pulsa, partículas que explodem na batida. É o game
+loop do Módulo 4 casado com o áudio: a cada frame, leia o som, desenhe a reação. O
+som vira o maestro; seus pixels, a orquestra.
+
+</Analogia>
+
+## Frequência vs. forma de onda
+
+O AnalyserNode te dá **dois retratos** diferentes do som, e escolher o certo é meio
+caminho:
+
+- **Frequência** (`getByteFrequencyData`) — quanta energia há em cada faixa, do grave
+  ao agudo. É o retrato das **barras de espectro** clássicas (graves à esquerda,
+  agudos à direita). Perfeito para "equalizador dançante".
+- **Forma de onda** (`getByteTimeDomainData`) — a pressão do som ao longo do tempo, a
+  **linha ondulada** de um osciloscópio. Perfeito para aquela linha que treme com a
+  voz.
+
+Em ambos os casos, você recebe valores `0..255`. O primeiro passo prático é reduzir
+esse array a um **nível geral** (0..1) para pulsar algo com a intensidade da música:
+
+```js
+function averageLevel(data) {
+  if (!data.length) return 0;
+  let sum = 0;
+  for (const v of data) sum += v;
+  return sum / data.length / 255;  // média, normalizada
+}
+```
+
+<Demo titulo="Espectro sintético — o círculo pulsa com o nível médio">
+  Abra o editor abaixo: o visualizador roda com um sinal fabricado (sem áudio real,
+  para funcionar offline), e o círculo central pulsa com o <code>averageLevel</code>
+  que você vai implementar.
+</Demo>
+
+<Aprofundamento titulo="A cadeia de áudio, o gesto do usuário e o offline">
+
+Montar o áudio-reativo de verdade é conectar uma **cadeia de nós**:
+
+```js
+const audioCtx = new AudioContext();
+const source = audioCtx.createMediaElementSource(audioElement); // um <audio>
+const analyser = audioCtx.createAnalyser();
+analyser.fftSize = 64;                       // resolução: nº de barras = fftSize/2
+source.connect(analyser);
+analyser.connect(audioCtx.destination);       // e segue para os alto-falantes
+
+const data = new Uint8Array(analyser.frequencyBinCount);
+function frame() {
+  analyser.getByteFrequencyData(data);        // preenche "data" com o som atual
+  desenhar(data);                             // sua reação visual
+  requestAnimationFrame(frame);
+}
+```
+
+Três coisas cruciais:
+
+1. **O gesto do usuário.** Navegadores bloqueiam áudio automático — um `AudioContext`
+   começa **suspenso** e só desperta após um clique/toque (`audioCtx.resume()`). Por
+   isso todo player precisa de um botão "tocar": não é só UX, é exigência do
+   navegador. Tente iniciar sem gesto e nada toca.
+
+2. **`fftSize`** controla a resolução da análise: `frequencyBinCount` (metade do
+   `fftSize`) é quantos "baldes" de frequência você recebe. Poucos = barras gordas e
+   suaves; muitos = espectro detalhado. Escolha pela estética.
+
+3. **O offline desta plataforma.** A regra é: nada de CDN. Os arquivos de música
+   ficam **locais** em `/public/media/`, servidos pelo próprio app — a plataforma já
+   vem com um loop lo-fi sintetizado em `/media/faisca-loop.wav` (dá para trocar por
+   um `.mp3`/`.wav` seu). Este exercício usa um sinal **sintético** (fabricado com
+   `Math.sin`) de propósito, porque ele é **auto-corrigido** e precisa desenhar sem
+   um clique — o foco aqui é a parte que importa: **mapear números de áudio em
+   movimento**. Já o desafio a seguir (o mini player) usa o arquivo de verdade: um
+   `<audio src="/media/faisca-loop.wav" crossorigin="anonymous">` + AnalyserNode,
+   tocando ao clique. É lá que o áudio real ganha vida.
+
+</Aprofundamento>
+
+<Dica>
+Suavize o visual: dados de áudio são "nervosos" (pulam muito entre frames). Aplique o
+`lerp` do Módulo 1 entre o valor atual e o novo (`atual = lerp(atual, novo, 0.3)`)
+para as barras subirem e descerem com elegância, em vez de tremer. Áudio cru + lerp =
+dança suave.
+</Dica>
+
+<Meta>
+
+Implemente `averageLevel(data)` — reduz o array de frequências (0..255) a um nível
+geral (0..1):
+
+- a média dos valores, dividida por 255;
+- array vazio retorna `0` (guard).
+
+Acertando, o círculo central do visualizador passa a **pulsar** com o nível do sinal.
+
+</Meta>

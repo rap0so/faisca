@@ -1,0 +1,107 @@
+<Analogia titulo="O palco de teatro com profundidade">
+
+Um palco de teatro não é um quadro plano — ele tem **profundidade**. Atores entram
+por trás, se aproximam, recuam; cenários deslizam em camadas; e você, na plateia, vê
+tudo isso porque está a uma certa **distância**, num ponto de vista fixo. Se você
+colasse o olho no palco, perderia a noção de profundidade; se estivesse longe demais,
+tudo pareceria chapado. A distância certa é o que dá a ilusão de 3D.
+
+O CSS tem esse palco embutido, e ele é surpreendentemente poderoso — dá para
+construir 3D real, com profundidade e rotação, **sem nenhuma biblioteca, sem WebGL,
+sem canvas**. A `perspective` é a distância da plateia ao palco. O
+`transform-style: preserve-3d` diz "estes filhos vivem num espaço 3D, não são
+adesivos chapados". E o `backface-visibility` decide se você vê o **verso** das
+coisas quando elas viram. Com esses três, você faz cards que giram, cubos que rodam,
+carrosséis com profundidade — a base do card flip que abre o desafio deste módulo.
+
+</Analogia>
+
+## Os três comandos do palco 3D
+
+```css
+.scene {
+  perspective: 900px;          /* a distância da "plateia": menor = mais dramático */
+}
+.card {
+  transform-style: preserve-3d; /* os filhos existem no espaço 3D */
+  transition: transform 600ms;
+}
+.card:hover {
+  transform: rotateY(180deg);   /* vira o card no eixo vertical */
+}
+.face {
+  backface-visibility: hidden;  /* não mostra o verso quando essa face está de costas */
+}
+.back {
+  transform: rotateY(180deg);   /* a face de trás já começa virada */
+}
+```
+
+O truque do flip: duas faces empilhadas no mesmo lugar (`position: absolute`), a de
+trás pré-rotacionada 180°. Com `backface-visibility: hidden`, cada face some quando
+está de costas — então, ao girar o card, uma face troca pela outra suavemente.
+
+<Demo titulo="Passe o mouse — o card vira em 3D">
+  <div style={{ perspective: "900px", display: "grid", placeItems: "center", minHeight: "200px" }}>
+    <div className="__flip3d">
+      <div className="__flip3d-face __flip3d-front">Faísca ✦</div>
+      <div className="__flip3d-face __flip3d-back">Vira!</div>
+    </div>
+  </div>
+  <style>{`
+    .__flip3d { position: relative; width: 150px; height: 190px; transform-style: preserve-3d; transition: transform 600ms cubic-bezier(0.22,1,0.36,1); }
+    .__flip3d:hover { transform: rotateY(180deg); }
+    .__flip3d-face { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 16px; backface-visibility: hidden; color: white; font-weight: 700; font-family: system-ui; }
+    .__flip3d-front { background: #7c5cff; }
+    .__flip3d-back { background: #ffb03a; color: #0e0f14; transform: rotateY(180deg); }
+    @media (prefers-reduced-motion: reduce) { .__flip3d { transition: none; } }
+  `}</style>
+</Demo>
+
+<Aprofundamento titulo="perspective, o ponto de fuga e a armadilha do backface esquecido">
+
+Alguns detalhes que separam um 3D convincente de um quebrado:
+
+- **`perspective` vai no PAI, não no elemento que gira.** Ela define o ponto de
+  observação para todos os filhos 3D. Um valor **menor** (ex: 400px) exagera a
+  profundidade (dramático, quase peixe-olho); **maior** (ex: 1500px) suaviza (sutil,
+  elegante). Colocá-la no elemento errado é o bug nº 1.
+
+- **`perspective-origin`** move o "ponto de fuga" — por padrão no centro, mas você
+  pode deslocá-lo para dar a sensação de olhar o palco de um ângulo.
+
+- **O backface esquecido.** Sem `backface-visibility: hidden`, ao virar um card você
+  vê a face da frente **espelhada** (o verso dela), o que arruína o efeito. Esse é o
+  erro mais comum no card flip — a face que deveria sumir aparece de trás, espelhada
+  e feia.
+
+- **`translateZ` e camadas reais.** Dentro de um `preserve-3d`, você pode empurrar
+  elementos para frente/trás com `translateZ`, montando cenas com profundidade real
+  (um cubo é seis faces com `rotateY`/`rotateX` + `translateZ`). É como se constrói
+  um cubo girável só com CSS.
+
+Uma nota de performance, fechando o elo com o Módulo 1: transforms 3D rodam na GPU
+(são baratos!), mas `preserve-3d` cria um contexto de empilhamento que pode
+interferir com `overflow`, `z-index` e clipping de formas estranhas. Use com
+intenção, e teste em contexto — 3D em CSS é lindo, mas tem suas pegadinhas de layout.
+
+</Aprofundamento>
+
+<Dica>
+Para um cubo: seis `.face` com `transform: rotateY(0/90/180/270deg) translateZ(metade
+do lado)` para os lados, e `rotateX(±90deg)` para topo e base. Gire o container e o
+cubo inteiro roda. É um exercício clássico e satisfatório depois que o flip faz
+sentido.
+</Dica>
+
+<Meta>
+
+Monte um **card flip 3D** que vira ao passar o mouse. No CSS:
+
+1. `perspective: 900px` na `.scene`.
+2. `transform-style: preserve-3d` na `.card`.
+3. `transform: rotateY(180deg)` no `.card:hover`.
+4. `backface-visibility: hidden` nas `.face`.
+5. `transform: rotateY(180deg)` na `.back` (a face de trás já virada).
+
+</Meta>

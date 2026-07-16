@@ -1,0 +1,80 @@
+<Analogia titulo="O flipbook que você redesenha inteiro">
+
+Lembra do flipbook do Módulo 0? Cada página é um quadro completo. Para o
+personagem andar, você não apaga só a perna dele numa página — você desenha a
+**página inteira de novo**, com ele um passo à frente. Quadro após quadro,
+redesenhado do zero, a ilusão de movimento acontece.
+
+O game loop do Canvas é isso, 60 vezes por segundo. Como o Canvas esquece tudo
+(immediate mode), cada frame é uma **folha nova**: você **limpa** a tela,
+**atualiza** as posições, e **desenha** tudo de novo. Essas três batidas — limpar,
+atualizar, desenhar — são o coração pulsante de todo jogo, toda simulação, todo
+efeito animado em Canvas. Esqueça o "limpar" e os quadros se acumulam num rastro
+borrado (o que às vezes é um efeito legal de propósito!). Domine essas três
+batidas e você domina a animação em Canvas.
+
+</Analogia>
+
+## As três batidas
+
+```js
+function frame() {
+  // 1. LIMPA — apaga o quadro anterior
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 2. ATUALIZA — avança o estado do mundo
+  x = (x + 3) % canvas.width;
+
+  // 3. DESENHA — pinta o novo quadro
+  ctx.fillStyle = "#ffb03a";
+  ctx.fillRect(x, 80, 40, 40);
+
+  requestAnimationFrame(frame); // agenda o próximo (Módulo 1!)
+}
+requestAnimationFrame(frame);
+```
+
+Repare como tudo que você aprendeu converge: o `requestAnimationFrame` do Módulo 1
+é o maestro; a separação **atualiza → desenha** é a mesma dos sistemas de partículas.
+A novidade é só o `clearRect` — a folha nova a cada frame.
+
+<Aprofundamento titulo="Separar 'update' de 'draw' e o problema do delta time">
+
+Manter **atualizar** e **desenhar** como passos distintos parece pedante num
+exemplo simples, mas é uma disciplina que salva projetos grandes:
+
+- **`update()`** mexe só nos dados (posições, velocidades, estados). Não toca no
+  canvas.
+- **`draw()`** só lê os dados e pinta. Não muda nada.
+
+Por que separar? Porque permite coisas poderosas: rodar `update` mais vezes que
+`draw` (física estável), pausar o desenho sem parar a simulação, testar a lógica
+sem renderizar, ou rebobinar o estado.
+
+Há uma armadilha de tempo aqui, ligada ao Módulo 1: se você atualiza "3 pixels **por
+frame**", a velocidade depende da taxa de quadros — num monitor de 120Hz tudo anda
+o dobro de rápido. A cura é o **delta time**: use o timestamp que o rAF te passa
+(`frame(time)`), calcule quanto tempo passou desde o último frame, e mova
+proporcionalmente a esse tempo (`x += velocidade * dt`). Assim, 30fps ou 144fps, a
+bola cruza a tela na mesma velocidade real. Para efeitos casuais, "por frame" basta;
+para jogos e física séria, delta time é obrigatório.
+
+</Aprofundamento>
+
+<Dica>
+Quer um **rastro** em vez de movimento limpo? Troque o `clearRect` por um
+preenchimento semitransparente: `ctx.fillStyle = "rgba(20,22,29,0.2)"; ctx.fillRect(...)`.
+Cada frame "apaga" só um pouco do anterior, deixando um trilho que desvanece —
+lindo para partículas e cometas.
+</Dica>
+
+<Meta>
+
+Complete o game loop com as três batidas:
+
+1. **Limpa**: `ctx.clearRect(0, 0, canvas.width, canvas.height)`.
+2. **Atualiza**: `x = (x + 3) % canvas.width`.
+3. **Desenha**: `ctx.fillStyle = "#ffb03a"; ctx.fillRect(x, 80, 40, 40)`.
+4. Agende o próximo: `requestAnimationFrame(frame)`.
+
+</Meta>

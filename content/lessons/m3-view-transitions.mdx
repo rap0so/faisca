@@ -1,0 +1,91 @@
+<Analogia titulo="A câmera de cinema que não corta">
+
+Num filme amador, as cenas trocam com um **corte seco**: estava na sala, *bum*, tá
+na rua. Já num filme bem-feito, a câmera **acompanha** — o personagem sai pela porta
+e a câmera desliza junto, e você nunca perde o fio de onde está. Seu cérebro
+mantém a continuidade porque viu o **caminho** entre um lugar e outro, não só o
+antes e o depois.
+
+Navegação na web quase sempre foi o corte seco: você clica, a página some, outra
+aparece — *bum*. A **View Transition API** traz a câmera de cinema para a web. Ela
+tira uma "foto" do estado atual, aplica o novo estado, e **anima a transição entre
+os dois automaticamente**. Um elemento que existe nas duas telas (uma foto que era
+miniatura e vira capa; um título que se reposiciona) **morfa** suavemente de um
+lugar para o outro. O usuário vê o caminho, mantém o contexto, e a navegação passa
+a parecer um app nativo em vez de um site que pisca.
+
+</Analogia>
+
+## O nome que liga os dois estados
+
+O ingrediente-chave é dar a um elemento um `view-transition-name` — um nome
+**estável** que o navegador usa para reconhecer "esse elemento aqui é o mesmo
+daquele lá" e morfar entre eles.
+
+```css
+.hero {
+  view-transition-name: hero;
+}
+```
+
+E, no JavaScript, você embrulha a mudança de estado numa transição:
+
+```js
+document.startViewTransition(() => {
+  // faça a mudança no DOM aqui (trocar conteúdo, navegar…)
+  updateThePage();
+});
+```
+
+O navegador cuida do resto: captura o antes, aplica o depois, e cria as animações de
+crossfade e de morph automaticamente. Elementos com o mesmo `view-transition-name`
+deslizam de uma posição para a outra; o resto faz um fade elegante.
+
+<Aprofundamento titulo="View Transitions no Next.js e o controle fino">
+
+No **Next.js (App Router)**, transições de rota com View Transitions são o santo
+graal do "app nativo na web". A ideia: ao navegar de `/galeria` para
+`/galeria/foto-3`, a miniatura clicada e a imagem grande da página de detalhe
+compartilham o mesmo `view-transition-name` — e a foto **cresce** suavemente da
+grade para a tela cheia. O React tem suporte experimental a isso (o componente
+`<ViewTransition>` e integração com o roteador), e é uma das peças que ficaria
+lindas nesta plataforma: navegar entre módulos com a técnica que o próprio módulo
+ensina.
+
+Você controla as animações com pseudo-elementos dedicados:
+
+```css
+::view-transition-old(hero) { animation: fade-out 300ms; }
+::view-transition-new(hero) { animation: fade-in 300ms; }
+```
+
+Cada `view-transition-name` gera um par `old`/`new` que você anima como quiser — com
+as mesmas ferramentas de sempre (`@keyframes`, easing). E, como não podia faltar no
+módulo que prega acessibilidade: envolva tudo num guard de `prefers-reduced-motion`,
+porque morfar telas é movimento — para quem pediu menos, faça um crossfade simples
+ou nenhum.
+
+**Suporte e degradação:** é uma API recente. A regra de ouro é
+`if (document.startViewTransition) { ... } else { updateThePage(); }` — com suporte,
+anima; sem suporte, a mudança acontece na hora, sem quebrar nada. Progressive
+enhancement puro: o efeito é um bônus, nunca um requisito.
+
+</Aprofundamento>
+
+<Dica>
+`view-transition-name` precisa ser **único** na página num dado momento — dois
+elementos com o mesmo nome ao mesmo tempo quebram a transição. O nome é uma
+"identidade" que o navegador segue entre os dois estados, não uma classe reutilizável.
+</Dica>
+
+<Meta>
+
+Para que um elemento possa **morfar** suavemente entre telas, ele precisa de um
+nome de transição estável:
+
+1. Dê à `.hero` um `view-transition-name: hero;`.
+
+(Este é o ingrediente que, combinado com `document.startViewTransition`, faz a foto
+crescer da miniatura para o detalhe.)
+
+</Meta>

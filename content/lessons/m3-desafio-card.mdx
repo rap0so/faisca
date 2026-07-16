@@ -1,0 +1,102 @@
+<Analogia titulo="A carta de baralho holográfica na mão">
+
+Você já segurou uma carta de baralho especial, dessas holográficas? Você a inclina
+levemente na mão e a luz **corre** pela superfície, a imagem parece ter
+profundidade, ela reage a cada micro-movimento do seu pulso. Você fica ali, virando
+a carta de um lado para o outro, hipnotizado — não porque a carta faz algo útil, mas
+porque ela responde ao seu toque de um jeito **físico e vivo**.
+
+É exatamente essa sensação que o desafio deste módulo captura: um card que **inclina
+em 3D** seguindo o cursor, com um **brilho que corre** pela superfície acompanhando o
+mouse. É o efeito que virou assinatura de portfólios e landing pages de produto — e
+que junta tudo que você aprendeu no módulo: `getBoundingClientRect` para saber onde
+o cursor está, a normalização `0..1` para calcular a inclinação, `perspective` para
+criar o espaço 3D, e custom properties para o glow seguir o mouse. Poucas
+interações dão tanto retorno de "uau" por tão pouco código.
+
+</Analogia>
+
+## As duas metades do efeito
+
+**Metade 1 — o espaço 3D (CSS).** Um card só pode inclinar em 3D se o pai criar
+perspectiva e o card preservar a profundidade:
+
+```css
+.scene { perspective: 800px; }          /* o "espaço" 3D */
+.card {
+  transform-style: preserve-3d;
+  transition: transform 200ms ease;       /* volta suave ao sair */
+}
+```
+
+**Metade 2 — a reação ao cursor (JS).** A cada `pointermove`, converta a posição do
+mouse em ângulos de inclinação e na posição do glow:
+
+```js
+card.addEventListener("pointermove", (e) => {
+  const r = card.getBoundingClientRect();
+  const px = (e.clientX - r.left) / r.width;   // 0..1
+  const py = (e.clientY - r.top) / r.height;
+  const rotY = (px - 0.5) * 20;                 // inclina no eixo Y
+  const rotX = (0.5 - py) * 20;                 // e no X (invertido!)
+  card.style.transform = "rotateX(" + rotX + "deg) rotateY(" + rotY + "deg)";
+  card.style.setProperty("--mx", px * 100 + "%"); // glow segue o cursor
+  card.style.setProperty("--my", py * 100 + "%");
+});
+card.addEventListener("pointerleave", () => {
+  card.style.transform = "rotateX(0) rotateY(0)";  // volta ao neutro
+});
+```
+
+<Aprofundamento titulo="Os detalhes que fazem parecer real (e os que quebram)">
+
+O efeito é simples de montar e fácil de errar. Os detalhes que importam:
+
+1. **O sinal do eixo X é invertido.** Quando o mouse sobe (`py` diminui), o topo do
+   card deve inclinar **para trás** — por isso `(0.5 - py)`, não `(py - 0.5)`. Trocar
+   o sinal faz o card parecer "empurrar" contra o cursor em vez de "seguir", e o
+   cérebro sente na hora que está errado, mesmo sem saber dizer por quê.
+
+2. **A transição só vale na saída.** Repare que aplicamos `transition: transform` mas
+   o `pointermove` atualiza o transform dezenas de vezes por segundo. Durante o
+   movimento, a transição de 200ms deixaria o card "arrastado" e mole. O truque:
+   durante o hover, os updates são tão frequentes que a transição mal aparece
+   (parece instantâneo e grudado no cursor); mas no `pointerleave`, com uma única
+   mudança grande de volta ao neutro, a transição finalmente respira e dá aquele
+   retorno suave. Um valor, dois comportamentos.
+
+3. **`perspective` no pai, não no card.** A perspectiva precisa estar no **contêiner**
+   para que o ponto de fuga seja compartilhado. No card, ela se aplicaria aos filhos
+   dele, não a ele mesmo.
+
+4. **Reduced motion.** Inclinação 3D é movimento intenso. Para quem pediu menos,
+   desligue a inclinação (mantenha talvez só o glow, que é sutil) — o guard fecha o
+   efeito com responsabilidade.
+
+Os checks automáticos verificam a montagem 3D (perspective, preserve-3d, transition).
+Mas se o efeito **sente bem** — se a inclinação segue na direção certa, se o glow
+acompanha, se a volta é suave — isso é o checklist que te convida a julgar. Como
+sempre no curso: os testes garantem a mecânica; o gosto é com você.
+
+</Aprofundamento>
+
+<Dica>
+Exagere os ângulos para depurar (`* 40` em vez de `* 20`) até ver o movimento
+claramente, depois reduza para o ponto de bom gosto. Efeitos 3D quase sempre ficam
+melhores **mais sutis** do que o primeiro impulso manda — 8 a 12 graus costuma ser o
+ponto doce.
+</Dica>
+
+<Meta>
+
+Transforme o card num objeto 3D que reage ao cursor:
+
+1. No `.card`, adicione `transform-style: preserve-3d` e uma `transition` em
+   `transform` (a `.scene` já tem `perspective`).
+2. O JavaScript já calcula a inclinação e o glow — deixe-o rodar.
+3. Adicione um guard de `prefers-reduced-motion` desligando a transição.
+
+Depois dos checks, use o **checklist** para julgar se a inclinação e o glow
+realmente parecem seguir o seu cursor.
+
+</Meta>

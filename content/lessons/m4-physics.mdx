@@ -1,0 +1,77 @@
+<Analogia titulo="A bola de tênis numa quadra com vento">
+
+Solte uma bola de tênis. A gravidade a puxa para baixo, acelerando. Ela bate no
+chão e quica — mas mais baixo, porque perdeu energia no impacto. E se houver ar
+denso (imagine debaixo d'água), ela também vai **desacelerando** o tempo todo,
+freada pela resistência do meio, até que quase para de quicar e rola até descansar.
+
+Toda física de tela convincente é a soma dessas três forças que você já sente na
+pele: **gravidade** (puxa numa direção), **resistência/atrito** (rouba um
+tiquinho de velocidade a cada instante) e **colisão com perda** (quica invertendo a
+direção, mas com menos energia). Você já montou pedaços disso no Módulo 1 — agora
+junta tudo num único passo de simulação, no Canvas, onde milhares de objetos podem
+obedecer a essas leis ao mesmo tempo. O bonito é que ninguém "anima" o quique: ele
+**acontece** como consequência das regras, exatamente como na vida real.
+
+</Analogia>
+
+## O passo com atrito
+
+```js
+function stepPhysics(p, gravity, friction) {
+  const vy = (p.vy + gravity) * friction;  // gravidade acelera, atrito freia
+  const vx = p.vx * friction;              // atrito freia o horizontal também
+  return { x: p.x + vx, y: p.y + vy, vx, vy };
+}
+
+// no loop, depois de mover: quica no chão perdendo energia
+if (ball.y > chao) { ball.y = chao; ball.vy *= -0.7; }
+```
+
+O `friction` (um número entre 0 e 1) multiplica a velocidade a cada frame — perto de
+`1` desliza muito, mais baixo para rápido. A colisão inverte `vy` (o `-`) e reduz
+(`0.7` = quica com 70% da energia). Três linhas, um mundo inteiro de comportamento.
+
+<Aprofundamento titulo="A ordem das operações e a estabilidade da simulação">
+
+A ordem em que você aplica as forças **importa** e é fonte de bugs sutis. O padrão
+seguro é sempre:
+
+1. **Acumule as forças na velocidade** (gravidade soma, atrito multiplica).
+2. **Aplique a velocidade na posição** (`pos += vel`).
+3. **Resolva colisões** (detecte o chão/paredes, corrija a posição, inverta a
+   velocidade).
+
+Inverter essa ordem gera artefatos: a bola "afunda" um pouco no chão antes de
+quicar, ou ganha energia do nada. Um cuidado clássico na colisão é **fixar a
+posição** (`ball.y = chao`) além de inverter a velocidade — senão, se a bola passou
+do chão num frame rápido, ela fica presa "vibrando" dentro dele.
+
+E o elo com a lição de performance (Módulo 1): esta é a **integração de Euler**,
+barata e perfeita para efeitos visuais, mas que acumula um errinho por frame. Com
+velocidades altas e frames longos, a bola pode **atravessar** paredes finas
+(tunneling) — o objeto se moveu tanto num frame que "pulou" por cima do obstáculo.
+Soluções vão de limitar a velocidade máxima a métodos de integração mais caros
+(Verlet, sub-stepping). Para fogos, chuva e bolinhas quicando, Euler + fixar posição
+resolve lindamente. Guarde o resto para quando a precisão realmente importar.
+
+</Aprofundamento>
+
+<Dica>
+Ajustar um único número muda toda a "sensação" do material: `friction` alto e quique
+`-0.9` parecem uma bola de borracha saltitante; `friction` baixo e quique `-0.3`
+parecem um saco de areia. Brinque com os valores até o peso parecer certo — física
+boa é 20% fórmula, 80% afinar constantes no olho.
+</Dica>
+
+<Meta>
+
+Implemente `stepPhysics(p, gravity, friction)`, com `p = { x, y, vx, vy }`:
+
+1. `vy = (p.vy + gravity) * friction`
+2. `vx = p.vx * friction`
+3. retorne `{ x: p.x + vx, y: p.y + vy, vx, vy }`
+
+Acertando, a bola da demo cai, quica e vai perdendo energia.
+
+</Meta>

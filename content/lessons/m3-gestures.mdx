@@ -1,0 +1,87 @@
+<Analogia titulo="O toque de campainha vs. segurar o botão">
+
+Apertar a campainha de casa rapidinho quer dizer "cheguei". Segurar o dedo na
+campainha por cinco segundos quer dizer outra coisa completamente diferente —
+impaciência, emergência, travessura de criança. **Mesmo botão, mesmo dedo** — o que
+muda o significado é a **duração** do aperto. E existe todo um espectro no meio:
+o toque, o segurar breve, o segurar longo.
+
+Interfaces ricas exploram isso. Um toque curta um post; segurar abre o menu de
+reações. Um clique seleciona; segurar arrasta. Entre "começou a apertar" e "soltou"
+existe um mundo de **estados intermediários** que a maioria das interfaces ignora —
+e é justamente ali que mora a sensação de profundidade e resposta. Ler a duração e
+a jornada de um gesto (não só o clique final) é o que separa uma interface que
+"funciona" de uma que parece **conversar** com você.
+
+</Analogia>
+
+## Medindo a jornada de um gesto
+
+```js
+function pressLevel(ms) {
+  if (ms < 200) return "tap";
+  if (ms < 600) return "hold";
+  return "longpress";
+}
+
+let start = 0;
+btn.addEventListener("pointerdown", () => { start = performance.now(); });
+btn.addEventListener("pointerup", () => {
+  const level = pressLevel(performance.now() - start);
+  // reaja diferente para tap, hold e longpress
+});
+```
+
+`pointerdown` marca o início, `pointerup` mede o fim, e a diferença (via
+`performance.now()`, mais preciso que `Date.now()`) te dá a duração. A partir dela,
+você classifica o gesto — e cada classe pode disparar uma reação diferente.
+
+<Aprofundamento titulo="Estados intermediários: mostrar o gesto acontecendo">
+
+O `pressLevel` classifica o gesto **depois** que ele termina. Mas as interfaces mais
+gostosas mostram o gesto **enquanto** ele acontece — o feedback intermediário.
+
+Pense num botão de "segurar para confirmar": enquanto você segura, um anel se
+preenche; se soltar antes de completar, ele volta; se segurar até o fim, confirma.
+Isso exige acompanhar o progresso **durante** o hold, não só no fim:
+
+```js
+let raf;
+btn.addEventListener("pointerdown", () => {
+  const start = performance.now();
+  (function tick() {
+    const progress = Math.min((performance.now() - start) / 600, 1);
+    ring.style.setProperty("--fill", progress);      // preenche o anel
+    if (progress < 1) raf = requestAnimationFrame(tick);
+    else confirm();
+  })();
+});
+btn.addEventListener("pointerup", () => cancelAnimationFrame(raf)); // cancelou
+```
+
+Repare que tudo que você aprendeu está aqui: o loop de `requestAnimationFrame` (M1),
+a normalização para `0..1` (M3), o cleanup do listener (M1). Estados intermediários
+também precisam de **saídas de emergência**: `pointercancel` (o sistema roubou o
+toque, ex: notificação), `pointerleave` (o dedo saiu do botão). Um gesto bem-feito
+sempre pode ser **abortado** no meio sem deixar a interface num estado estranho —
+essa reversibilidade é o que faz o usuário se sentir no controle.
+
+</Aprofundamento>
+
+<Dica>
+Use `performance.now()` para medir durações, não `Date.now()`. Ele é monotônico
+(nunca anda para trás, imune a ajustes de relógio) e tem precisão de frações de
+milissegundo — feito exatamente para medir intervalos.
+</Dica>
+
+<Meta>
+
+Implemente `pressLevel(ms)`, que classifica a duração de um aperto:
+
+- `ms < 200` → `"tap"`
+- `ms < 600` → `"hold"`
+- senão → `"longpress"`
+
+Segure o botão da demo por tempos diferentes e veja o gesto ser reconhecido.
+
+</Meta>

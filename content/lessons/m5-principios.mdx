@@ -1,0 +1,77 @@
+<Analogia titulo="O saco de farinha e a bola de boliche">
+
+Deixe cair um saco de farinha e uma bola de boliche do mesmo lugar. Os dois caem
+igual (obrigado, gravidade), mas o que acontece **no impacto** conta a história do
+peso: a farinha se **espalha e achata** (squash), o corpo mole absorvendo o baque;
+a bola de boliche mal deforma, dura, densa. Sem ver o objeto, seu cérebro sabe o
+que é cada um só pela **maneira como se deforma ao se mover**.
+
+Os animadores da Disney codificaram isso nos anos 1930 nos "12 princípios da
+animação" — regras sobre como o movimento comunica peso, intenção e vida. E o
+segredo mal-guardado é que **eles funcionam igualzinho na web**. Um botão que
+"agacha" um tiquinho antes de saltar (antecipação), um card que estica levemente ao
+ser arremessado (stretch), um menu cujas partes continuam se ajeitando depois que
+ele para (follow-through) — são os mesmos princípios de um desenho da Pixar,
+aplicados a pixels de interface. Este módulo não é sobre *como* animar (você já
+sabe); é sobre *o que faz uma animação ter alma*.
+
+</Analogia>
+
+## Os três que mais mudam a web
+
+<Demo titulo="A mesma queda, com e sem princípios">
+  <SquashStretchDemo />
+</Demo>
+
+Repare na diferença acima. A bola da esquerda cai com velocidade constante e nunca
+deforma — tecnicamente "animada", emocionalmente morta. A da direita:
+
+- **Antecipação** — ela se agacha **antes** de cair (o "recuo antes do golpe"). Toda
+  ação forte é precedida por uma preparação na direção oposta. É o que avisa o olho
+  "algo vai acontecer".
+- **Squash & stretch** — ela **estica** ao cair rápido e **achata** no impacto. A
+  deformação comunica velocidade e peso. Regra de ouro: o **volume se conserva** —
+  se estica na vertical, encolhe na horizontal (senão vira outro objeto).
+- **Follow-through / ease** — ela **desacelera** ao subir e **assenta** com um
+  quique residual, em vez de parar seco. Nada na natureza para instantaneamente.
+
+<Aprofundamento titulo="Traduzindo os 12 princípios para a interface">
+
+Nem todos os 12 princípios da animação clássica cabem na web, mas os que cabem são
+transformadores:
+
+- **Antecipação** → o `:active` que afunda antes de soltar; um menu que "puxa" um
+  frame antes de abrir.
+- **Squash & stretch** → o overshoot do easing (Módulo 0!) já é uma forma sutil
+  disso; use com parcimônia em ícones e toasts.
+- **Ease in / ease out (slow in/out)** → você já domina: entradas com `ease-out`,
+  saídas com `ease-in`. É o princípio mais importante e o mais fácil de aplicar.
+- **Follow-through & overlapping action** → quando um card entra, o conteúdo dele
+  pode entrar um tiquinho depois (o stagger da próxima lição); partes que "seguem" o
+  movimento principal.
+- **Arcs (arcos)** → movimento natural raramente é em linha reta; um elemento que
+  cruza a tela numa curva sutil parece mais orgânico que um `translateX` reto.
+- **Exaggeration (exagero)** → na dose certa, um pouco de exagero lê como
+  "intencional e alegre"; de menos parece tímido, de mais parece palhaçada.
+
+O erro clássico do desenvolvedor é aplicar timing e easing perfeitos a um movimento
+**rígido** — tecnicamente suave, mas sem peso. A cura não é mais código; é
+emprestar esses princípios de animação de personagem. Um `scale(1.02)` no momento
+certo diz mais que dez `cubic-bezier` afinados.
+
+</Aprofundamento>
+
+<Dica>
+Cuidado com o volume: se você aplicar `scaleY(1.3)` num squash, compense com
+`scaleX(0.7)` mais ou menos, para o objeto não "inchar". Squash sem conservar volume
+faz a coisa parecer que mudou de tamanho, não que amassou.
+</Dica>
+
+<Meta>
+
+Esta lição é de **olhar**, não de digitar. Brinque com o demo acima até sentir
+**por que** a bola da direita parece viva. Depois, observe animações que você admira
+(no seu celular, num app que ama) e tente nomear qual princípio está em ação. Marque
+como concluída quando conseguir "enxergar" os princípios no mundo real.
+
+</Meta>

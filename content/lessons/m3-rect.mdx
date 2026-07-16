@@ -1,0 +1,79 @@
+<Analogia titulo="Duas réguas medindo da mesma parede">
+
+Imagina que você e um amigo querem descrever onde um quadro está numa sala. Você
+mede a partir da porta; ele mede a partir da janela. Vocês dão números
+**diferentes** para o **mesmo** quadro — não porque um está errado, mas porque cada
+um usa um ponto de partida diferente. Para combinarem, precisam converter: "a que
+distância o quadro está da porta, sabendo onde a janela fica em relação à porta".
+
+O navegador tem esse problema o tempo todo. O mouse (`e.clientX/Y`) é medido a
+partir do **canto da janela**. Um elemento na tela também tem uma posição a partir
+do canto da janela — e é isso que `getBoundingClientRect()` te dá. Quando você quer
+saber "onde o cursor está **dentro** deste card?", você faz a mesma conversão do
+quadro: subtrai a posição do card da posição do cursor. Essa subtração
+simplezinha é a base de **toda** interação avançada com cursor: tilts, glows que
+seguem o mouse, lentes de aumento, pincéis. Uma vez que você domina "cursor menos
+caixa", um mundo de efeitos se abre.
+
+</Analogia>
+
+## A conversão fundamental
+
+```js
+function relativePos(rect, clientX, clientY) {
+  return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+element.addEventListener("pointermove", (e) => {
+  const rect = element.getBoundingClientRect();
+  const p = relativePos(rect, e.clientX, e.clientY);
+  // p.x, p.y agora são relativos ao canto do elemento
+});
+```
+
+`getBoundingClientRect()` devolve um objeto com `left`, `top`, `right`, `bottom`,
+`width`, `height` — tudo relativo à janela (viewport). Subtraia `left`/`top` das
+coordenadas do cursor e pronto: você tem a posição **local**.
+
+<Aprofundamento titulo="Normalizar para 0..1: a chave para efeitos que escalam">
+
+Um passo a mais que multiplica seu poder: dividir a posição local pelo tamanho do
+elemento, para obter valores de **0 a 1**.
+
+```js
+const px = (e.clientX - rect.left) / rect.width;   // 0 na esquerda, 1 na direita
+const py = (e.clientY - rect.top) / rect.height;   // 0 no topo, 1 embaixo
+```
+
+Por que isso importa? Porque `0..1` é **independente do tamanho**. O centro é sempre
+`0.5`, não importa se o card tem 200px ou 800px. Com esse número normalizado você
+alimenta qualquer efeito: `(px - 0.5)` te dá a distância do centro (para o tilt do
+desafio deste módulo), `px * 100 + "%"` posiciona um glow, `lerp(corA, corB, px)`
+faz um gradiente seguir o mouse. Normalizar é o que deixa seus efeitos funcionarem
+igual em qualquer tela.
+
+Dois cuidados de performance, conectando com o Módulo 1: `getBoundingClientRect()`
+**força um reflow** (o navegador precisa recalcular o layout para te dar a medida).
+Chamá-lo dentro de um `pointermove` que dispara dezenas de vezes por segundo é
+geralmente ok, mas se você tiver muitos elementos, faça o cache do rect e só recalcule
+quando a página rolar ou redimensionar. E escreva no `transform`/custom property (que
+você já sabe ser barato), nunca em `top`/`left`.
+
+</Aprofundamento>
+
+<Dica>
+`pointermove` (em vez de `mousemove`) é o evento moderno certo: funciona igual para
+mouse, caneta e toque. Um só listener cobre todos os dispositivos.
+</Dica>
+
+<Meta>
+
+Implemente `relativePos(rect, clientX, clientY)` — a conversão que leva a posição
+do cursor da janela para dentro do elemento:
+
+- `relativePos({ left: 100, top: 50 }, 150, 80)` → `{ x: 50, y: 30 }`
+- `relativePos({ left: 0, top: 0 }, 20, 40)` → `{ x: 20, y: 40 }`
+
+Acertando, o ponto laranja da demo segue o cursor dentro da caixa.
+
+</Meta>

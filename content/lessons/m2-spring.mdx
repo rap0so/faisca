@@ -1,0 +1,82 @@
+<Analogia titulo="O elástico que puxa e balança">
+
+Prende um objeto num elástico e puxa até uma marca. Solta. O que acontece? Ele não
+"desliza suavemente até parar" — ele **dispara** de volta, passa da marca, volta um
+pouco menos, oscila algumas vezes e **assenta**. Quanto mais longe você puxou, mais
+forte ele voltou. É físico, é familiar, e é profundamente satisfatório porque o seu
+corpo **conhece** essa sensação da vida real.
+
+É por isso que molas (springs) parecem tão vivas na tela — e por que curvas de
+easing fixas, por mais bonitas, às vezes parecem "de máquina". Uma `cubic-bezier`
+sempre faz o **mesmo** movimento na mesma duração, não importa de onde você veio.
+Uma mola não tem duração fixa: ela reage à **distância** e à **velocidade atual**.
+Interrompa no meio e mande para outro lugar, e ela transita naturalmente, carregando
+o embalo. É movimento que responde ao contexto — e isso é o que o cérebro lê como
+"real".
+
+</Analogia>
+
+## A física de uma mola, em três linhas
+
+```js
+function stepSpring(state, target, stiffness, damping) {
+  const force = (target - state.value) * stiffness;   // puxa: quanto mais longe, mais forte
+  const velocity = (state.velocity + force) * damping; // acumula e perde um pouco (atrito)
+  const value = state.value + velocity;                // move
+  return { value, velocity };
+}
+```
+
+Duas constantes governam a personalidade:
+
+- **`stiffness`** (rigidez): o quão forte a mola puxa. Alto = rápido e reativo;
+  baixo = preguiçoso e suave.
+- **`damping`** (amortecimento): o quanto de energia sobra a cada frame. Perto de 1
+  = balança muito (elástico); mais baixo = assenta rápido (mola dentro de mel).
+
+Rode isso a cada frame perseguindo um alvo, e você tem movimento com peso e vida —
+o mesmo motor por trás do Framer Motion / Motion que você usa no AnimatedOdds.
+
+<Aprofundamento titulo="Por que molas são a base das animações modernas de UI">
+
+Bibliotecas como o Motion trocaram durações por molas como padrão — e por bons
+motivos:
+
+1. **Interruptível de graça.** Como o próximo estado depende só de `value` e
+   `velocity` atuais, você pode mudar o `target` **a qualquer momento** e a mola
+   redireciona suavemente, carregando a velocidade. Com `duration`, interromper no
+   meio dá aquele "pulo" feio.
+2. **Naturalmente proporcional.** Um gesto pequeno gera um movimento pequeno e
+   rápido; um grande, um movimento amplo. Você não ajusta durações à mão para cada
+   caso — a física resolve.
+3. **Um vocabulário, não mil curvas.** Em vez de decorar dezenas de `cubic-bezier`,
+   você pensa em duas ideias intuitivas: "quão rígida" e "quão amortecida".
+
+O modelo que usamos aqui é o mais simples (mola + amortecimento por passo). Existem
+formulações mais precisas (baseadas na solução analítica do oscilador harmônico,
+com massa/rigidez/amortecimento), mas para UI o passo iterativo é o que quase todo
+mundo usa — barato, estável e convincente. Você acabou de implementar o coração de
+uma biblioteca de animação.
+
+</Aprofundamento>
+
+<Dica>
+Cuidado com a estabilidade: `damping` deve ficar entre 0 e 1. Valores muito altos de
+`stiffness` com `damping` alto podem fazer a mola "explodir" (oscilar cada vez mais
+forte em vez de assentar) — o sinal de que a simulação ficou instável. Comece
+conservador (`stiffness` ~0.1, `damping` ~0.8) e ajuste.
+</Dica>
+
+<Meta>
+
+Implemente `stepSpring(state, target, stiffness, damping)`, com `state = { value, velocity }`:
+
+1. `force = (target - value) * stiffness`
+2. `velocity = (velocity + force) * damping`
+3. `value = value + velocity`
+4. retorne `{ value, velocity }`
+
+Acertando, o quadrado da demo passa a perseguir o seu mouse com aquele balanço de
+mola.
+
+</Meta>

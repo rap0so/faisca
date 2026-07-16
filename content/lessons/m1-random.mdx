@@ -1,0 +1,74 @@
+<Analogia titulo="O cozinheiro que não mede tudo igual">
+
+Dois cozinheiros fazem o mesmo prato. O primeiro coloca **exatamente** a mesma
+quantidade de tudo, sempre — o resultado é preciso, mas meio robótico, meio
+"industrial". O segundo varia um tiquinho: uma pitada a mais de sal aqui, um fio
+de azeite ali. Não é bagunça — é variação **dentro de um limite de bom senso**. É
+o que faz parecer feito à mão, vivo.
+
+Efeitos que parecem naturais precisam desse segundo cozinheiro. Se todas as suas
+partículas têm o mesmo tamanho, a mesma velocidade e o mesmo ângulo, o efeito
+parece uma máquina. Um borrifo de aleatoriedade — tamanhos variando entre X e Y,
+velocidades num intervalo, ângulos espalhados — e de repente parece orgânico. O
+segredo não é o caos total; é **aleatoriedade controlada**: variação, mas dentro
+de faixas que você escolhe.
+
+</Analogia>
+
+## Domando o `Math.random()`
+
+`Math.random()` te dá um número entre `0` e `1`. Cru, ele é quase inútil — quem
+quer um valor entre 0 e 1? O poder está em **mapear** esse 0..1 para o intervalo
+que você precisa. E olha só: é o mesmo movimento do `lerp` da lição passada.
+
+```js
+// um valor entre min e max, a partir de um r (0..1)
+function randRange(min, max, r) {
+  return min + (max - min) * r;
+}
+
+// na vida real, você alimenta com Math.random():
+const tamanho = randRange(8, 20, Math.random());
+```
+
+Separar o "mapa" (`randRange`) da "fonte de aleatoriedade" (`Math.random()`) tem
+uma vantagem enorme, que a caixa abaixo revela.
+
+<Aprofundamento titulo="Seeds: aleatoriedade que você pode repetir">
+
+`Math.random()` tem um problema para quem faz efeitos: ele é **irrepetível**. Cada
+recarga gera uma sequência nova, então você não consegue reproduzir aquele
+"estouro perfeito" que aconteceu uma vez, nem testar de forma determinística.
+
+A solução é um **PRNG com seed** (gerador pseudo-aleatório semeado). Você dá uma
+"semente" (um número inicial) e ele produz sempre a **mesma sequência** de números
+que *parecem* aleatórios. Mesma seed, mesmo efeito — toda vez. Isso é ouro para:
+
+- reproduzir um bug num efeito procedural;
+- gerar mundos/paisagens que ficam iguais entre sessões (jogos fazem isso);
+- criar variação "aleatória" que na verdade é controlada e testável.
+
+Repare por que separamos `randRange(min, max, r)` do `Math.random()`: com o `r`
+vindo de fora, você pode trocar a fonte por um PRNG semeado sem mudar uma linha da
+sua lógica de efeito. A aleatoriedade vira um **ingrediente que você controla**,
+não uma força da natureza.
+
+</Aprofundamento>
+
+<Dica>
+Para distribuições que parecem mais naturais, some vários randoms e divida
+(`(Math.random() + Math.random()) / 2`) — isso puxa os valores para o meio, como
+uma curva de sino. Aleatoriedade uniforme raramente é o que a natureza faz.
+</Dica>
+
+<Meta>
+
+Implemente `randRange(min, max, r)`, onde `r` é um valor `0..1`:
+
+- `r = 0` → `min`
+- `r = 1` → `max`
+- `r = 0.5` → o meio
+
+(É o mesmo espírito do `lerp` — repare na simetria.)
+
+</Meta>

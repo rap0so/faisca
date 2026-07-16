@@ -1,0 +1,68 @@
+<Analogia titulo="O maestro da orquestra">
+
+Imagina uma orquestra tentando tocar junto **sem** maestro. Cada músico segue seu
+próprio relógio; em segundos, é uma bagunça — uns adiantados, outros atrasados.
+O maestro existe para dar **um único pulso** que todos seguem. Todo mundo toca no
+compasso dele.
+
+Na tela, o maestro é o `requestAnimationFrame` (rAF). O navegador redesenha a
+tela em pulsos — tipicamente 60 por segundo. Se você tenta animar por conta
+própria (com `setInterval`, digamos), você toca no seu relógio, não no do
+navegador: seus updates caem no meio de um redesenho, geram frames perdidos e
+travadinhas. Quando você pede um frame com rAF, você está dizendo "me avise
+**exatamente** quando você for desenhar o próximo quadro" — e aí você toca no
+compasso do maestro. Movimento suave é movimento sincronizado.
+
+</Analogia>
+
+## O padrão do loop
+
+```js
+function frame() {
+  // 1. atualize o estado (posições, velocidades…)
+  // 2. desenhe (mude estilos, pinte o canvas…)
+  requestAnimationFrame(frame); // 3. peça o próximo pulso
+}
+requestAnimationFrame(frame); // dê o pontapé inicial
+```
+
+O truque é a **recursão**: cada frame agenda o próximo. É um loop que respeita o
+ritmo do navegador em vez de brigar com ele.
+
+<Aprofundamento titulo="setInterval é um relógio quebrado para animação">
+
+`setInterval(fn, 16)` parece "60fps" (1000ms / 60 ≈ 16ms), mas mente por três
+motivos:
+
+1. **Não é sincronizado com a tela.** Seu callback pode disparar no meio de um
+   frame, então o navegador ou ignora seu update até o próximo redesenho, ou
+   redesenha na hora errada — em ambos os casos, jank.
+2. **Não sabe a taxa real do monitor.** Num monitor de 120Hz, você quer 120fps;
+   num de 30Hz, 30. rAF se adapta; `setInterval` fica preso no seu palpite.
+3. **Não pausa quando a aba está oculta.** rAF congela automaticamente em abas em
+   segundo plano (economiza bateria e CPU); `setInterval` continua torrando
+   recursos à toa.
+
+Um bônus: o rAF passa um **timestamp** para seu callback (`frame(time)`). Com ele
+você pode calcular o *delta* entre frames e animar por tempo real em vez de por
+quadro — o que mantém a velocidade constante mesmo se a taxa oscilar. Você vai
+usar isso quando as coisas ficarem sérias no Canvas.
+
+</Aprofundamento>
+
+<Dica>
+Guarde o id que o `requestAnimationFrame` devolve (`const id = requestAnimationFrame(frame)`)
+para poder **cancelar** o loop depois com `cancelAnimationFrame(id)`. Loop que não
+sabe parar é vazamento de recurso — e você vai domar isso na lição de React.
+</Dica>
+
+<Meta>
+
+Crie um loop de animação que move o quadrado para a direita, para sempre:
+
+1. Defina uma função `frame()`.
+2. Dentro dela, aumente `x` e mova o box com `transform: translateX(...)`.
+3. No fim de `frame()`, chame `requestAnimationFrame(frame)` de novo.
+4. Dê o pontapé inicial chamando `requestAnimationFrame(frame)` uma vez.
+
+</Meta>

@@ -1,0 +1,12 @@
+.editor {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.editor :global(.cm-editor) {
+  height: 100%;
+}
+.editor :global(.cm-gutters) {
+  background: transparent;
+  border-right: 1px solid var(--line-soft);
+}

@@ -1,0 +1,78 @@
+<Analogia titulo="A pimenta no prato">
+
+Uma pitada de pimenta transforma um prato — desperta, dá calor, memória. O
+cozinheiro iniciante, empolgado, conclui: "se uma pitada é boa, uma colher é
+melhor!". E arruína o prato. O tempero genial não está em usar **muito**; está em
+saber **quando parar** — e, às vezes, em não temperar aquele prato de jeito nenhum,
+porque ele já está perfeito.
+
+Animação é pimenta. Depois de aprender partículas, springs, 3D, canvas, a tentação
+é apimentar tudo — cada botão pula, cada card gira, cada transição explode. E o
+resultado é uma interface **exaustiva**, onde o movimento deixou de significar algo
+porque está em todo lugar. A habilidade mais difícil e mais valiosa deste curso
+inteiro não é fazer uma animação impressionante. É o **bom gosto**: saber quando uma
+animação serve o usuário e quando serve só o seu ego, e ter a disciplina de **cortar**
+a segunda. Animar é fácil; saber *quando não animar* é maestria.
+
+</Analogia>
+
+## Deliciosa vs. irritante
+
+A mesma técnica pode encantar ou torturar. O que separa uma da outra?
+
+- **Frequência.** O detalhe que faz sorrir na **primeira** vez vira suplício na
+  **quinquagésima**. Uma animação de deletar exuberante é linda numa demo e um
+  inferno para quem deleta 40 e-mails por dia. Pergunte sempre: *quantas vezes o
+  usuário vai ver isso?* Quanto mais frequente, mais **discreta e rápida** deve ser.
+- **Velocidade.** Animações que **atrasam** o usuário são as mais odiadas. Se eu
+  cliquei, eu quero o resultado — uma transição de 600ms entre mim e minha ação é um
+  pedágio. Regra: interações frequentes → 150–250ms no máximo; celebrações raras
+  podem se dar ao luxo de durar.
+- **Propósito.** Toda animação deveria responder "para que você existe?". Boas
+  respostas: *dou feedback* (algo respondeu), *oriento* (para onde a coisa foi),
+  *mostro relação* (isto virou aquilo), *deleito num momento raro* (você conquistou
+  algo). Má resposta: *porque eu consigo*.
+
+<Aprofundamento titulo="Os quatro trabalhos legítimos de uma animação (e o teste do 'e se eu tirar?')">
+
+Animação na interface tem quatro empregos honestos. Se a sua não faz nenhum deles,
+ela provavelmente deveria sair:
+
+1. **Feedback** — confirmar que uma ação foi registrada (o botão que afunda, o ✓ que
+   aparece). O mais importante e o mais frequente.
+2. **Orientação** — mostrar de onde veio e para onde foi (um modal que cresce do
+   botão que o abriu; um item que voa para o carrinho). Preserva o contexto espacial.
+3. **Relação/continuidade** — revelar que A se transformou em B (as View Transitions
+   do Módulo 3; a miniatura que vira capa). Evita o "corte seco" que desorienta.
+4. **Deleite** — o momento raro de celebração (os fogos ao concluir um módulo aqui).
+   Legítimo **justamente porque é raro**. Deleite constante deixa de ser deleite.
+
+O teste definitivo é brutal e libertador: **"e se eu tirar essa animação?"** Se a
+interface fica pior, confusa ou fria — a animação estava trabalhando, mantenha. Se a
+interface fica **igual, só mais rápida** — a animação era decoração, corte. Fazer
+essa pergunta honestamente sobre cada animação do seu projeto é o exercício que mais
+melhora o seu trabalho.
+
+E há a dimensão ética, que amarra o curso inteiro: `prefers-reduced-motion` não é um
+detalhe técnico, é uma expressão de bom gosto e respeito. A pessoa de melhor gosto
+não é a que faz o movimento mais impressionante — é a que sabe que **movimento é um
+custo** (de atenção, de performance, de conforto físico) e o gasta com intenção. O
+Josh Comeau, o Rauno, os artistas de motion que você admira: o que os separa não é
+saber mais técnicas que você agora sabe. É o **julgamento** de quando usá-las.
+
+</Aprofundamento>
+
+<Dica>
+Uma heurística prática: anime **generosamente em momentos raros** (onboarding,
+conquistas, primeira vez) e **minimamente em ações frequentes** (salvar, navegar,
+digitar). O orçamento de "uau" de um usuário é finito — gaste-o onde ele conta.
+</Dica>
+
+<Meta>
+
+Faça o exercício mais valioso do módulo: pegue um projeto seu (ou um app que você
+usa) e, para cada animação, pergunte **"e se eu tirar?"**. Quantas sobreviveriam ao
+corte? Marque como concluída quando o "quando NÃO animar" tiver virado um instinto,
+não uma regra decorada.
+
+</Meta>

@@ -1,0 +1,71 @@
+<Analogia titulo="Confete numa festa">
+
+Quando alguém estoura um popper de confete, cem papeizinhos voam pelo ar,
+rodopiam e caem. Ninguém pega cada papelzinho um por um antes da festa e guarda
+depois — eles são **criados** no estouro e, quando pousam, alguém **varre** e
+joga fora. É produção em massa: aparecem juntos, cumprem seu papel, e somem.
+
+Um efeito de partículas na web é isso. Você não deixa cem `<div>` escondidos no
+HTML esperando. Você os **cria via JavaScript** no momento do estouro
+(`document.createElement`), joga no palco (`appendChild`), e — parte crucial que
+todo iniciante esquece — os **remove** quando terminam. Confete que não é varrido
+vira lixo acumulado; partícula que não é removida vira um DOM inchado que engasga
+a página.
+
+</Analogia>
+
+## Criar e destruir
+
+```js
+// criar
+const p = document.createElement("div");
+p.className = "particle";
+field.appendChild(p);
+
+// destruir quando a animação acabar
+p.addEventListener("animationend", () => p.remove());
+```
+
+Nesta lição você só cria. Mas grave a segunda metade na memória: **toda partícula
+criada precisa de um plano de morte.** Sem ele, cada clique deixa entulho para
+trás e a página fica mais lenta a cada interação.
+
+<Aprofundamento titulo="Reflow em massa e o DocumentFragment">
+
+Cada `appendChild` num elemento que está na página pode disparar um recálculo de
+layout. Adicionar 100 elementos num loop com 100 `appendChild` pode causar 100
+reflows — caro. Duas defesas:
+
+1. **DocumentFragment**: monte tudo "fora da tela" e insira uma vez só.
+   ```js
+   const frag = document.createDocumentFragment();
+   for (let i = 0; i < 100; i++) frag.appendChild(makeParticle());
+   field.appendChild(frag); // um único reflow
+   ```
+2. **Pooling**: em vez de criar e destruir sem parar, reaproveite um "pool" de
+   elementos — esconda em vez de remover, e reative quando precisar. Vale a pena
+   quando o volume é alto e constante.
+
+Para dúzias de partículas ocasionais, `createElement`/`remove` direto está ótimo.
+Para centenas por segundo, você vai querer sair do DOM e ir para o Canvas — que é
+justamente o Módulo 4.
+
+</Aprofundamento>
+
+<Dica>
+`element.remove()` é o jeito moderno e limpo de tirar um nó do DOM — esqueça o
+antigo `parent.removeChild(child)`. E prefira ouvir o evento `animationend` a
+chutar um `setTimeout` com a duração na mão: se você mudar a duração no CSS, o
+`animationend` continua certo sozinho.
+</Dica>
+
+<Meta>
+
+Ao clicar no botão, crie **12** elementos `<div class="particle">` e adicione-os
+ao `.field`:
+
+1. No listener de clique, faça um loop de 12 iterações.
+2. Em cada uma, `document.createElement("div")`, dê a classe `particle`.
+3. `appendChild` no `.field`.
+
+</Meta>

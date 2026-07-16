@@ -1,0 +1,101 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-6) var(--sp-8);
+}
+.header {
+  margin-bottom: var(--sp-6);
+}
+.title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+.tally {
+  display: flex;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+  margin-top: var(--sp-2);
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+.tally strong {
+  color: var(--spark);
+}
+
+.certLink {
+  display: block;
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  border: 1px dashed var(--line);
+  background: var(--surface-1);
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+.certLink:hover {
+  transform: translateY(-1px);
+}
+.certLink[data-earned] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--spark) 45%, transparent);
+  background: linear-gradient(120deg, var(--spark-soft), var(--surface-1));
+  color: var(--text);
+}
+.certLink strong {
+  color: var(--spark);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--sp-4);
+}
+.badge {
+  padding: var(--sp-5) var(--sp-4);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line-soft);
+  background: var(--surface-1);
+  text-align: center;
+  opacity: 0.55;
+  filter: grayscale(1);
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
+}
+.badge[data-unlocked] {
+  opacity: 1;
+  filter: none;
+  border-color: color-mix(in srgb, var(--spark) 40%, transparent);
+  background: linear-gradient(160deg, var(--spark-soft), var(--surface-1));
+}
+.badge[data-unlocked]:hover {
+  transform: translateY(-3px);
+}
+.medal {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto var(--sp-3);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  background: var(--surface-3);
+  color: var(--text-faint);
+}
+.badge[data-unlocked] .medal {
+  background: var(--spark);
+  color: var(--ink);
+}
+.badgeName {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: var(--sp-1);
+}
+.badgeHint {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  line-height: 1.4;
+}

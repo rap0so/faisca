@@ -1,0 +1,87 @@
+<Analogia titulo="O cardume que se move como um só">
+
+Olha um cardume de milhares de peixes, ou uma revoada de estorninhos desenhando
+formas no céu. Parece uma criatura única, inteligente, coreografada. Mas não há
+coreógrafo, nem cérebro coletivo. Cada peixe segue **regrinhas simples**, sozinho —
+e a beleza do todo **emerge** da multidão. Ninguém programou a forma; ela nasce da
+escala.
+
+Sistemas de partículas são o cardume da tela. Cada partícula é burríssima: só sabe
+"tenho uma posição e uma velocidade; a cada frame ando um pouco". Mas junte
+centenas ou milhares delas, cada uma com uma direção e velocidade um tico diferente
+(aleatoriedade controlada, Módulo 1!), e o conjunto vira fumaça, faíscas, chuva,
+poeira mágica. E é **aqui** que o Canvas mostra sua força: pintar mil pontos por
+frame é trivial para ele, enquanto seriam mil elementos DOM sufocando o navegador.
+Escala é o superpoder do Canvas, e partículas são sua expressão mais pura.
+
+</Analogia>
+
+## Uma partícula é só números
+
+```js
+function makeParticle(x, y, angle, speed) {
+  return {
+    x, y,
+    vx: Math.cos(angle) * speed,  // velocidade decomposta (trig do Módulo 1)
+    vy: Math.sin(angle) * speed,
+  };
+}
+
+// no loop: mover e pintar cada uma
+particles.forEach((p) => {
+  p.x += p.vx;
+  p.y += p.vy;
+  ctx.fillRect(p.x, p.y, 3, 3);
+});
+```
+
+Cada partícula é um objetinho com posição e velocidade. Um `array` guarda todas, e o
+game loop percorre o array atualizando e desenhando. Some centenas com ângulos
+espalhados e você tem uma explosão.
+
+<Aprofundamento titulo="Object pooling: o segredo de manter 60fps com milhares">
+
+Aqui a lição do Módulo 1 sobre "criar e destruir" reaparece com força total. Num
+efeito grande, partículas nascem e morrem o tempo todo — e criar/destruir objetos
+sem parar faz o **garbage collector** do JavaScript acordar e causar micro-travadas
+(aqueles engasgos de 1 frame que somem e voltam).
+
+A técnica profissional é o **object pooling**: em vez de criar objetos novos e jogar
+fora os mortos, você mantém um **pool** (uma reserva) de partículas e as **recicla**.
+Uma partícula "morta" não é deletada — é marcada como inativa e reaproveitada no
+próximo `burst`. Zero alocação no loop quente, zero trabalho para o coletor de lixo,
+FPS estável mesmo com dezenas de milhares de partículas.
+
+```js
+const pool = Array.from({ length: 5000 }, () => ({ x: 0, y: 0, vx: 0, vy: 0, active: false }));
+function spawn(x, y, angle, speed) {
+  const p = pool.find((p) => !p.active); // pega uma reserva
+  if (p) Object.assign(p, { x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, active: true });
+}
+```
+
+E não desenhe uma por vez com `beginPath`/`fill` se puder evitar — para pontinhos,
+`fillRect` direto é mais rápido; para muitos círculos idênticos, desenhe um
+uma vez num canvas pequeno e "carimbe" com `drawImage`. Otimização, como sempre,
+vem **depois** de medir (Módulo 1) — mas pooling é o primeiro lugar onde olhar.
+
+</Aprofundamento>
+
+<Dica>
+Um preenchimento semitransparente no lugar do `clearRect` (o truque de rastro da
+lição anterior) faz cada partícula deixar um trilho — transforma pontos secos numa
+nuvem sedosa. Combine com opacidade que decai por partícula e você tem fumaça.
+</Dica>
+
+<Meta>
+
+Implemente `makeParticle(x, y, angle, speed)` — cria uma partícula com velocidade
+decomposta a partir do ângulo:
+
+- `vx = Math.cos(angle) * speed`
+- `vy = Math.sin(angle) * speed`
+- retorne `{ x, y, vx, vy }`
+
+Acertando, a demo explode 200 partículas do centro.
+
+</Meta>

@@ -1,0 +1,80 @@
+<Analogia titulo="O livro pop-up que se monta na sua mão">
+
+Lembra dos livros pop-up de criança? Você virava a página e o castelo **se erguia**,
+a ponte **se estendia**, o dragão **saltava** para fora. A história não estava só nas
+palavras — estava no **ato de revelar**, no ritmo com que cada elemento aparecia
+conforme você avançava. O movimento era parte da narrativa.
+
+Scrollytelling é o livro pop-up da web. Conforme o leitor rola, os elementos se
+revelam, se movem, se transformam — e o **scroll vira o narrador**. Feito bem, é uma
+das experiências mais memoráveis que a web oferece: reportagens imersivas do New York
+Times, páginas de produto da Apple, portfólios que hipnotizam. Feito mal, é uma
+página que treme e distrai. Este desafio junta o Módulo 3 inteiro (IntersectionObserver,
+scroll-driven animations) com a **narrativa** do Módulo 5: não basta revelar coisas —
+é preciso criar um **ritmo**, uma jornada com começo, tensão e clímax.
+
+</Analogia>
+
+## De "coisas aparecem" para "uma história é contada"
+
+O starter já revela cada seção com IntersectionObserver (Módulo 3). Isso é o chão. A
+missão é transformar revelação em **narrativa**:
+
+- **Ritmo, não repetição.** Se toda seção entra igual (fade + sobe), vira monotonia.
+  Varie: uma desliza da esquerda, outra amplia, outra revela em stagger seus filhos.
+  A variação é o que mantém o leitor engajado.
+- **Um arco.** Pense em começo (estabelece), meio (desenvolve, cria tensão) e um
+  **clímax** (o momento que justifica a rolagem toda). A última seção deve ser a
+  recompensa.
+- **Orientação.** O leitor precisa saber onde está e que há mais. Uma barra de
+  progresso scroll-driven no topo (Módulo 3, `animation-timeline: scroll()`) faz isso
+  com elegância e zero JavaScript.
+
+<Aprofundamento titulo="scroll-linked vs. scroll-triggered, e o pecado do scrolljacking">
+
+Há duas gramáticas de scrollytelling, e misturá-las com sabedoria é a chave:
+
+- **Scroll-triggered** (gatilho): um evento dispara quando o elemento entra na tela e
+  então **toca sozinho** (o IntersectionObserver revelando uma seção). Bom para
+  entradas — o leitor controla o ritmo da rolagem, o elemento cuida da própria
+  animação.
+- **Scroll-linked** (amarrado): o progresso da animação é **atado** à posição do
+  scroll — role metade, a animação está na metade (o `animation-timeline: scroll()`).
+  Bom para barras de progresso, parallax, e transformações que o leitor "controla"
+  com o dedo.
+
+O grande **pecado** a evitar é o *scrolljacking*: sequestrar a rolagem do usuário,
+travando-a ou mudando sua velocidade para forçar sua coreografia. É desorientador,
+quebra a expectativa fundamental de "eu rolo, a página acompanha", e é hostil à
+acessibilidade. A regra de ouro do scrollytelling elegante: **o leitor sempre está no
+controle da rolagem**; você orquestra o que acontece *em resposta* a ela, nunca a
+rolagem em si.
+
+E, como sempre neste curso, a responsabilidade fecha o trabalho: `prefers-reduced-motion`
+deve transformar os deslizes dramáticos em fades simples (o conteúdo continua sendo
+revelado, só sem o movimento que pode enjoar), e o desempenho precisa ser impecável —
+scroll é o momento em que jank aparece mais, então só `transform`/`opacity`, sempre.
+
+</Aprofundamento>
+
+<Dica>
+Teste rolando **para cima** também. Muitos scrollytellings só pensam na descida e
+ficam estranhos na volta (elementos que não re-escondem, ou piscam). Decida
+conscientemente: a revelação é permanente (revela uma vez, com `unobserve`) ou
+reversível? As duas são válidas — escolha e seja consistente.
+</Dica>
+
+<Meta>
+
+Construa uma **página de scrollytelling** com narrativa. Parta do starter (3 seções +
+IntersectionObserver) e vá além:
+
+1. Dê **ritmo** — varie as entradas, não repita a mesma animação.
+2. Crie um **arco** com um clímax na última seção.
+3. Adicione **orientação** (uma barra de progresso scroll-driven).
+4. `prefers-reduced-motion` e performance cuidados.
+
+Sem gabarito. Use o **checklist** para julgar se virou uma história, e marque como
+concluída.
+
+</Meta>

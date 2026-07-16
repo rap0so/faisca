@@ -1,0 +1,76 @@
+<Analogia titulo="O teatro de fantoches vs. o quadro de giz">
+
+Pensa em duas formas de contar uma história visual. No **teatro de fantoches**,
+cada personagem é um boneco que **existe** — você o segura, ele tem nome, você
+pode movê-lo, guardá-lo, perguntar "onde está o fantoche do lobo?". O DOM e o SVG
+são assim: cada elemento é um objeto que persiste, que você pode selecionar e
+manipular depois.
+
+O **Canvas** é o quadro de giz. Você desenha um lobo com giz — e naquele instante
+ele é só **tinta na superfície**. Não existe "o objeto lobo" para pegar depois; se
+você quer movê-lo, apaga aquela região e desenha de novo em outro lugar. É o que
+se chama **immediate mode**: você emite comandos de pintura, eles acontecem na
+hora, e o canvas esquece — não guarda uma lista de formas, só o resultado pintado.
+
+Essa diferença é a alma do Canvas. Ela custa conveniência (nada de "clicar num
+círculo", porque não há círculo, só pixels) mas dá uma **velocidade absurda**:
+pintar dez mil pontos é tão barato quanto pintar um, porque o navegador não precisa
+gerenciar dez mil objetos na memória. É por isso que Canvas é a ferramenta dos
+efeitos em grande escala.
+
+</Analogia>
+
+## Pegando o pincel
+
+```js
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");   // o "pincel" 2D
+
+ctx.fillStyle = "#7c5cff";             // escolhe a cor
+ctx.beginPath();                       // começa um caminho
+ctx.arc(150, 100, 60, 0, Math.PI * 2); // círculo: centro (150,100), raio 60
+ctx.fill();                            // preenche
+```
+
+O `getContext("2d")` te dá o `ctx`, o objeto por onde passam **todos** os comandos
+de desenho. `fillStyle` é a cor, `beginPath`/`arc`/`fill` desenham. Repare: depois
+do `fill()`, não sobra nenhum "objeto círculo" — só pixels roxos no canvas.
+
+<Aprofundamento titulo="O modelo de estado do ctx (e a pegadinha do tamanho)">
+
+O `ctx` é uma **máquina de estados**: `fillStyle`, `strokeStyle`, `lineWidth`,
+`font` etc. ficam "grudados" e valem para todos os desenhos seguintes até você
+trocá-los. Por isso `ctx.save()` e `ctx.restore()` existem — para empilhar e
+recuperar o estado (cor, transformações) sem bagunçar o resto.
+
+E aqui está a pegadinha que pega **todo mundo** no primeiro dia de Canvas: existem
+**dois tamanhos**, e confundi-los borra tudo.
+
+- O tamanho do **buffer de desenho**: os atributos `width`/`height` no elemento
+  (`<canvas width="300" height="200">`). É a resolução real, a grade de pixels.
+- O tamanho de **exibição**: o `width`/`height` no **CSS**. É o quanto ele ocupa
+  na tela.
+
+Se você define só o CSS, o canvas mantém o buffer padrão (300×150) e o navegador
+o **estica** para o tamanho CSS — resultado: tudo borrado e esticado. Sempre defina
+os atributos `width`/`height` (idealmente multiplicando por `devicePixelRatio` para
+telas retina). Lembra da lição de `viewBox` do SVG? É o mesmo conceito de "resolução
+interna vs. tamanho na tela", só que no Canvas você controla na mão.
+
+</Aprofundamento>
+
+<Dica>
+`fill()` preenche por dentro; `stroke()` desenha só o contorno. E `ctx.arc(x, y, r,
+0, Math.PI * 2)` é o feitiço para um círculo completo — os dois últimos números são
+os ângulos de início e fim (0 até uma volta inteira).
+</Dica>
+
+<Meta>
+
+Pinte um círculo preenchido no centro do canvas:
+
+1. Pegue o contexto: `const ctx = canvas.getContext("2d")`.
+2. Escolha a cor: `ctx.fillStyle = "#7c5cff"`.
+3. Desenhe e preencha: `ctx.beginPath(); ctx.arc(150, 100, 60, 0, Math.PI * 2); ctx.fill();`.
+
+</Meta>

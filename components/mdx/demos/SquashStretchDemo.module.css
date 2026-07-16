@@ -1,0 +1,115 @@
+.wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.columns {
+  display: flex;
+  gap: var(--sp-6);
+  width: 100%;
+  justify-content: center;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.arena {
+  position: relative;
+  width: 90px;
+  height: 150px;
+  border-bottom: 2px solid var(--line);
+}
+.ball {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  border-radius: 50%;
+  background: var(--spark);
+  animation-duration: 1.1s;
+  animation-iteration-count: infinite;
+  animation-play-state: paused;
+}
+.ball[data-playing] {
+  animation-play-state: running;
+}
+
+/* lifeless: constant speed, rigid, no deformation */
+.flat {
+  animation-name: dropFlat;
+  animation-timing-function: linear;
+  transform-origin: center bottom;
+}
+@keyframes dropFlat {
+  0%,
+  100% {
+    top: 0;
+  }
+  50% {
+    top: 108px;
+  }
+}
+
+/* alive: anticipation, gravity easing, squash on impact, stretch in flight */
+.alive {
+  animation-name: dropAlive;
+  background: var(--pulse);
+  transform-origin: center bottom;
+}
+@keyframes dropAlive {
+  0% {
+    top: 0;
+    transform: scale(1, 1);
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 0.5);
+  }
+  8% {
+    transform: scale(1.12, 0.88);
+  } /* anticipation: crouch before */
+  45% {
+    transform: scale(0.85, 1.18);
+  } /* stretch while falling fast */
+  50% {
+    top: 108px;
+    transform: scale(1.35, 0.6);
+    animation-timing-function: cubic-bezier(0, 0.5, 0.5, 1);
+  } /* squash on impact */
+  90% {
+    transform: scale(0.95, 1.05);
+  }
+  100% {
+    top: 0;
+    transform: scale(1, 1);
+  }
+}
+
+.tag {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+.tag[data-good] {
+  color: var(--pulse);
+}
+.toggle {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+.toggle:hover {
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ball {
+    animation: none;
+    top: 108px;
+  }
+}

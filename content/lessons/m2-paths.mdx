@@ -1,0 +1,73 @@
+<Analogia titulo="Ditando o caminho para alguém de olhos fechados">
+
+Imagina guiar uma pessoa de olhos vendados segurando uma caneta sobre um papel.
+Você só pode dar comandos curtos: "**vá** para o ponto tal", "trace uma **linha
+reta** até ali", "faça uma **curva** passando por aqui". Com esses comandinhos,
+você consegue fazer ela desenhar qualquer coisa — uma letra, um mapa, um monstro.
+
+O atributo `d` de um `<path>` é exatamente essa lista de comandos ditados para a
+caneta. Cada letra é uma instrução: `M` é "mova a caneta para cá" (sem desenhar),
+`L` é "linha reta até lá", `C` e `Q` são curvas, `A` é arco, `Z` é "feche o
+caminho". Todo ícone, todo logo, toda ilustração vetorial que você já viu é, no
+fundo, uma dessas ditadas. Dominar o alfabeto do `d` é ganhar a chave de todo
+desenho vetorial — inclusive o que ferramentas geram para você.
+
+</Analogia>
+
+## O alfabeto essencial
+
+| Comando | Significa | Exemplo |
+|---|---|---|
+| `M x y` | **M**ove a caneta (sem traçar) | `M 20 52` |
+| `L x y` | **L**inha reta até (x, y) | `L 42 74` |
+| `C x1 y1 x2 y2 x y` | **C**úbica de Bézier (2 pontos de controle) | curva suave |
+| `Q x1 y1 x y` | **Q**uadrática (1 ponto de controle) | curva simples |
+| `A rx ry ... x y` | **A**rco de elipse | cantos, pizzas |
+| `Z` | Fecha o caminho (volta ao início) | — |
+
+Um "check" (tique de confirmação) é só três comandos: mover ao começo, uma linha
+para baixo, outra linha para cima.
+
+```
+d="M 20 52 L 42 74 L 80 30"
+```
+
+<Aprofundamento titulo="Maiúsculas vs. minúsculas: absoluto vs. relativo">
+
+Cada comando existe em duas versões: **maiúscula** (coordenadas absolutas,
+contadas da origem do viewBox) e **minúscula** (relativas, contadas a partir de
+onde a caneta está agora).
+
+- `L 50 50` → vá para o ponto absoluto (50, 50).
+- `l 10 0` → ande 10 para a direita a partir de onde você está.
+
+Relativo é ouro para desenhos que se repetem ou que você quer mover inteiros sem
+recalcular tudo. Um zigue-zague fica `l 10 -10 l 10 10 l 10 -10...` — cada passo é
+relativo ao anterior. Ferramentas de desenho tendem a cuspir absoluto (mais fácil
+de gerar); humanos escrevendo à mão costumam preferir relativo (mais fácil de
+raciocinar).
+
+Sobre as curvas: `C` e `Q` funcionam como a `cubic-bezier` do easing que você já
+conhece — pontos de controle "puxam" a linha. A diferença é que aqui os pontos
+vivem no espaço 2D do desenho, não no gráfico tempo×progresso. Mesmíssima
+matemática de Bézier, contexto diferente.
+
+</Aprofundamento>
+
+<Dica>
+Ative uma grade mental: com `viewBox="0 0 100 100"`, o centro é `(50,50)`, os
+cantos são `(0,0)` e `(100,100)`. Pensar em porcentagens do quadro deixa muito mais
+fácil mirar os pontos sem chutar.
+</Dica>
+
+<Meta>
+
+Desenhe um **check** (tique) preenchendo o atributo `d` do `<path>`:
+
+1. `M 20 52` — mova a caneta para o começo.
+2. `L 42 74` — linha reta para baixo (a ponta do tique).
+3. `L 80 30` — linha reta para cima (a perna longa).
+
+Resultado esperado: `d="M 20 52 L 42 74 L 80 30"`.
+
+</Meta>

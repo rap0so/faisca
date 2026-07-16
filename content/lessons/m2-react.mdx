@@ -1,0 +1,78 @@
+<Analogia titulo="A fôrma de biscoito e o rolo de massa">
+
+Você pode desenhar cada biscoito à mão, um por um — cansativo e desigual. Ou pode
+fazer **uma fôrma** e carimbar quantos quiser, todos consistentes, variando só o
+recheio. Componentizar SVG em React é trocar o "desenhar à mão" pelo "carimbar com
+fôrma": você descreve o ícone **uma vez** como um componente, e depois só passa
+propriedades — cor, tamanho, progresso — e ele se redesenha sozinho.
+
+E aqui o React brilha de um jeito especial com SVG. Como SVG é só markup (tags e
+atributos), ele **é JSX** quase sem tradução: um `<circle>` no SVG é um `<circle>`
+no React. Então você ganha o superpoder de gerar geometria a partir de **dados**:
+um medidor que preenche conforme um número, um relógio cujos ponteiros vêm da hora,
+um gráfico que redesenha quando os dados mudam. Em vez de manipular o DOM na mão
+(`setAttribute` daqui, `createElement` dali, como fizemos no vanilla), você
+**declara** "dado este estado, o SVG é assim" — e o React cuida do resto.
+
+</Analogia>
+
+## Geometria a partir de dados: o padrão-chave
+
+O que quase todo componente SVG parametrizado precisa é converter **ângulos em
+pontos**. Medidores, arcos, relógios, gráficos de rosca — todos nascem disto:
+
+```js
+function polarToCartesian(cx, cy, r, angleDeg) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return {
+    x: Math.round(cx + r * Math.cos(rad)),
+    y: Math.round(cy + r * Math.sin(rad)),
+  };
+}
+```
+
+Com essa função, um componente `<Gauge value={0.7} />` calcula o ângulo do ponteiro
+(`0.7` → 252° de um arco), converte em `(x, y)`, e desenha. Mude a prop e o React
+redesenha. É a trigonometria do Módulo 1 virando uma **fôrma de biscoito**
+reutilizável.
+
+<Aprofundamento titulo="Declarativo vs. imperativo: os dois mundos de animar SVG">
+
+Você já viu os dois lados, mesmo sem nomeá-los:
+
+- **Imperativo** (o que fizemos no vanilla): "pegue o elemento, mude o atributo,
+  faça de novo no próximo frame". Você comanda cada passo. Poderoso e direto, mas
+  você gerencia tudo na mão — inclusive a limpeza.
+- **Declarativo** (o jeito React): "dado este estado, o SVG **é** assim". Você
+  descreve o resultado; o framework calcula as mudanças. O estado muda → a UI segue.
+
+Para animação em React, isso significa uma decisão importante que ecoa a lição de
+"portar para React" do Módulo 1: valores que mudam **a cada frame** (a posição de
+uma mola, o ângulo de um ponteiro girando) não devem virar `useState` — isso
+dispararia 60 re-renders por segundo. Guarde-os em `useRef` e escreva direto no
+atributo/estilo do nó SVG. Já valores que mudam por **interação** (o alvo de uma
+mola, o `value` de um medidor que o usuário ajustou) são estado de verdade e vivem
+em `useState`. Estado para intenção, ref para o loop quente.
+
+Bibliotecas como o Motion embrulham esse padrão num `<motion.circle>` que você anima
+declarativamente com springs — juntando o melhor dos dois mundos. Mas por baixo, é
+sempre `useRef` + escrita direta no loop.
+
+</Aprofundamento>
+
+<Dica>
+SVG em JSX tem pegadinhas de nomenclatura: atributos com hífen viram camelCase
+(`stroke-width` → `strokeWidth`, `stroke-dasharray` → `strokeDasharray`), mas
+`viewBox` continua `viewBox`. O editor avisa quando você erra.
+</Dica>
+
+<Meta>
+
+Implemente `polarToCartesian(cx, cy, r, angleDeg)` — o coração de todo componente
+SVG parametrizado. Retorne `{ x, y }` (arredondados) do ponto na circunferência:
+
+- `polarToCartesian(50, 50, 40, 0)` → `{ x: 90, y: 50 }` (direita)
+- `polarToCartesian(50, 50, 40, 90)` → `{ x: 50, y: 90 }` (baixo)
+- `polarToCartesian(50, 50, 40, 180)` → `{ x: 10, y: 50 }` (esquerda)
+
+</Meta>

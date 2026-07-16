@@ -1,65 +1,112 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ProgressRing } from "@/components/progress/ProgressRing";
+import { getProfile, getProgressMap } from "@/lib/progress";
+import {
+  CURRICULUM,
+  moduleProgress,
+  nextLesson,
+  overallProgress,
+} from "@/lib/selectors";
+import styles from "./page.module.css";
 
-export default function Home() {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export default function Dashboard() {
+  const profile = getProfile();
+  const map = getProgressMap();
+  const overall = overallProgress(map);
+  const resume = nextLesson(map);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <div>
+          <p className={styles.kicker}>Caderno de laboratório</p>
+          <h1 className={styles.title}>
+            Oi, {profile.display_name}. Vamos animar alguma coisa?
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className={styles.lede}>
+            Um estúdio pessoal pra estudar movimento na web — da física das
+            partículas ao bom gosto de quando <em>não</em> animar.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className={styles.stats}>
+          <Stat value={profile.xp} label="XP" accent="spark" />
+          <Stat
+            value={profile.current_streak}
+            label="dias de ofensiva"
+            accent="mint"
+          />
+          <Stat
+            value={`${overall.done}/${overall.total}`}
+            label="lições"
+            accent="pulse"
+          />
         </div>
-      </main>
+      </header>
+
+      <section className={styles.resume}>
+        <ProgressRing value={overall.value} size={116} sublabel="do curso" />
+        <div className={styles.resumeText}>
+          <p className={styles.resumeKicker}>Continuar de onde parou</p>
+          <h2 className={styles.resumeTitle}>{resume.lesson.title}</h2>
+          <p className={styles.resumeMeta}>
+            Módulo {resume.module.index} · {resume.module.title}
+          </p>
+          <Link
+            href={`/curso/${resume.module.slug}/${resume.lesson.slug}`}
+            className={styles.resumeCta}
+          >
+            {map[resume.lesson.slug] ? "Retomar" : "Começar"} →
+          </Link>
+        </div>
+      </section>
+
+      <section>
+        <h2 className={styles.sectionTitle}>Os 8 módulos</h2>
+        <div className={styles.grid}>
+          {CURRICULUM.map((module) => {
+            const p = moduleProgress(module, map);
+            return (
+              <Link
+                key={module.slug}
+                href={`/curso/${module.slug}`}
+                className={styles.card}
+              >
+                <ProgressRing
+                  value={p.value}
+                  size={72}
+                  stroke={6}
+                  label={`${p.done}/${p.total}`}
+                />
+                <div>
+                  <p className={styles.cardIndex}>Módulo {module.index}</p>
+                  <h3 className={styles.cardTitle}>{module.title}</h3>
+                  <p className={styles.cardTagline}>{module.tagline}</p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Stat({
+  value,
+  label,
+  accent,
+}: {
+  value: number | string;
+  label: string;
+  accent: string;
+}) {
+  return (
+    <div className={styles.stat} data-accent={accent}>
+      <span className={styles.statValue}>{value}</span>
+      <span className={styles.statLabel}>{label}</span>
     </div>
   );
 }

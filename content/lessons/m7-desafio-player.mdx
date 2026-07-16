@@ -1,0 +1,97 @@
+<Analogia titulo="O toca-discos que você não cansa de olhar">
+
+Existe algo hipnótico num bom toca-discos: o vinil girando, a capa do álbum ali na
+sua frente, e — se for daqueles modernos — luzes que pulsam com a música. Você fica
+olhando não porque precisa, mas porque é **gostoso**. O objeto celebra a música em
+vez de só reproduzi-la. Um mini music player na web pode ter exatamente essa alma:
+uma capa que você **vira** para ver a faixa, um visualizador que **dança** com o som,
+controles que respondem ao toque com prazer.
+
+Este é o desafio que fecha o curso — e ele é a síntese perfeita do Bônus Whimsy:
+o **3D com CSS** (a capa que faz flip, Módulo 7), o **game loop em Canvas** (o
+visualizador, Módulo 4), a **Web Audio** para reagir ao som (Módulo 7), e o **bom
+gosto** (Módulo 5) para juntar tudo sem virar bagunça. É pequeno, é vistoso, e é o
+tipo de peça que fica linda no portfólio. Você tem todas as peças; a missão é
+montá-las com carinho.
+
+</Analogia>
+
+## As três peças do player
+
+O starter te dá um esqueleto funcional. Sua missão é torná-lo **seu**:
+
+- **A capa 3D flip** (Módulo 7). Uma capa que vira ao clicar, revelando a info da
+  faixa no verso — `perspective`, `preserve-3d`, `backface-visibility`. Já está
+  montada; refine as duas faces (arte na frente, detalhes atrás).
+- **O visualizador** (Módulo 4). Um canvas com barras que dançam com o som **de
+  verdade**: clique em "Tocar" e o loop lo-fi local toca enquanto o `AnalyserNode`
+  alimenta as barras. Antes de tocar, elas idlam com uma ondinha sintética. Dê a ele
+  o seu ritmo, suas cores, seu estilo.
+- **Os controles** (Módulos 0 e 5). Um botão de tocar/pausar com micro-interação;
+  talvez um slider de progresso. Discretos, táteis, claros.
+
+<Aprofundamento titulo="A cadeia de áudio que já vem montada (e como estendê-la)">
+
+O starter já faz o que a lição anterior deixou como "bônus": ele toca um arquivo
+**local** (`/media/faisca-loop.wav` — música sintetizada, self-hosted, offline) e
+reage a ele. Vale estudar a cadeia, porque é o padrão de todo áudio-reativo:
+
+```js
+playBtn.addEventListener("click", async () => {
+  if (!audioCtx) {                              // monta a cadeia na primeira vez
+    audioCtx = new AudioContext();
+    const src = audioCtx.createMediaElementSource(audio); // <audio src="/media/...">
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    src.connect(analyser); analyser.connect(audioCtx.destination);
+    data = new Uint8Array(analyser.frequencyBinCount);
+  }
+  await audioCtx.resume();                       // o gesto que o navegador exige
+  audio.play();
+});
+
+// no loop:
+analyser.getByteFrequencyData(data);             // e desenhe a partir de "data"
+```
+
+Repare nos três pontos da lição de áudio, todos presentes no starter: o **gesto do
+usuário** (o clique no "tocar" que desperta o `AudioContext`), o **arquivo local** em
+`/public/media/` (nada de CDN — o espírito offline; o `crossorigin="anonymous"` no
+`<audio>` permite a análise), e o **lerp** para suavizar as barras nervosas. Daqui,
+os caminhos de extensão são muitos: troque a faixa por uma sua (jogue um `.mp3`/`.wav`
+em `/public/media/`), separe graves/agudos em cores diferentes, faça a capa pulsar no
+grave, adicione um slider de progresso lendo `audio.currentTime`. É a sua peça — o som
+real é só o começo. Com isso, seu visualizador para de "fingir" e passa a dançar com a
+música de verdade.
+
+E o fechamento de curso, honesto: aqui não há gabarito. O starter já funciona — a
+mecânica está de pé. A pergunta que importa é se o player ficou **encantador** — se dá
+vontade de ficar mexendo nele, se o flip é satisfatório, se a dança das barras
+combina com a música. Isso é o **checklist**, o seu julgamento. É onde tudo o que
+você aprendeu sobre técnica **e** sobre gosto se encontra numa peça só. Termine esta,
+e você não é mais alguém que "sabe animar". Você é alguém que **cria coisas vivas na
+web**, com as mãos e com critério. Foi essa a jornada inteira. 🎧
+
+</Aprofundamento>
+
+<Dica>
+Sincronize os dois mundos: faça a capa girar devagar (como um vinil) **enquanto** a
+música toca, e parar quando pausa — ligando `animation-play-state` (ou a WAAPI!) ao
+estado do player. Pequenos detalhes de coerência como esse são o que fazem uma peça
+parecer inteira, não um amontoado de features.
+</Dica>
+
+<Meta>
+
+Clique em **Tocar**: o player já reproduz um loop lo-fi local e o visualizador dança
+com o som real. A partir daí, **torne-o seu** — cores, layout, uma capa mais bonita,
+graves e agudos em cores diferentes, um slider de progresso, coerência entre a capa
+girando e a música.
+
+**Bônus de mestre:** troque a faixa por uma **sua** (jogue um `.mp3`/`.wav` em
+`/public/media/`) e faça a capa pulsar no grave.
+
+Use o **checklist** para julgar o encanto, marque como concluída — e vá buscar o seu
+**certificado**. Você terminou o curso. 🎓✦
+
+</Meta>

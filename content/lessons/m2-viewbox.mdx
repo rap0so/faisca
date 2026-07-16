@@ -1,0 +1,67 @@
+<Analogia titulo="A moldura que enquadra o quadro">
+
+Pensa numa câmera fotográfica apontada para uma paisagem enorme. O que aparece na
+foto não é a paisagem inteira — é só o **pedaço que cabe no enquadramento**. Você
+pode apontar para um canto, dar zoom, afastar. A cena lá fora não muda; o que muda
+é a **janelinha por onde você olha**.
+
+O `viewBox` do SVG é exatamente essa janelinha. Ele diz: "de todo o espaço de
+coordenadas possível, mostre-me **este retângulo**". E aqui está a mágica: o SVG
+depois **estica** esse retângulo para preencher o tamanho real na tela (`width`/
+`height`). Por isso um SVG é infinitamente escalável — você não desenha em pixels,
+desenha num sistema de coordenadas abstrato, e o `viewBox` decide qual pedaço vira
+imagem e quão esticado ele fica. Entender isso é a chave de todo o SVG.
+
+</Analogia>
+
+## Os quatro números
+
+```
+viewBox="min-x  min-y  largura  altura"
+```
+
+- **min-x, min-y** — o canto superior-esquerdo da janela (onde ela começa).
+- **largura, altura** — o tamanho da janela **no sistema de coordenadas do SVG**
+  (não em pixels!).
+
+Um `viewBox="0 0 100 100"` diz "minha janela vai de (0,0) até (100,100)". Se você
+desenhar um círculo em `cx=50 cy=50`, ele fica no centro — não importa se o SVG na
+tela tem 40px ou 400px. As coordenadas são relativas à janela, não à tela.
+
+<Aprofundamento titulo="viewBox vs. width/height: dois tamanhos diferentes">
+
+Todo SVG tem **dois** conceitos de tamanho que confundem no começo:
+
+1. **`width`/`height`** (nos atributos ou no CSS): o tamanho **físico** na página,
+   em pixels. É o tamanho da "foto revelada".
+2. **`viewBox`**: o tamanho do **espaço de coordenadas** interno. É o
+   enquadramento.
+
+A relação entre eles é a **escala**. Um `viewBox="0 0 100 100"` num SVG de
+`400×400px` significa "cada unidade do meu sistema vale 4px na tela". Aumente o
+`width` e tudo cresce junto, nítido, sem pixelar — porque o navegador recalcula os
+vetores, não estica bitmap.
+
+E se as proporções não baterem (viewBox quadrado, mas width/height retangular)? Aí
+entra o `preserveAspectRatio`, que decide se o desenho estica, encaixa centralizado
+ou corta. O padrão (`xMidYMid meet`) encaixa tudo centralizado sem distorcer — que
+é o que você quer 95% das vezes.
+
+</Aprofundamento>
+
+<Dica>
+Um truque poderoso: **animar o viewBox** é dar zoom e pan de câmera de graça.
+Interpole os quatro números ao longo do tempo e você tem uma câmera cinematográfica
+passeando pelo seu desenho — sem mexer em nenhum elemento interno.
+</Dica>
+
+<Meta>
+
+O círculo está em `(50, 50)` com raio `40`, mas o `viewBox` está pequeno demais e
+corta tudo. Ajuste a janela:
+
+1. Mude o `viewBox` do `<svg>` para `"0 0 100 100"`.
+
+Veja o círculo aparecer inteiro e centralizado — você reenquadrou a câmera.
+
+</Meta>

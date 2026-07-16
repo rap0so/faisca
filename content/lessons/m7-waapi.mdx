@@ -1,0 +1,83 @@
+<Analogia titulo="O controle remoto da animação">
+
+Imagina assistir a um filme sem controle remoto: ele toca do começo ao fim, e é só.
+Agora com o controle: você pausa, volta, adianta, coloca em câmera lenta, dá um
+replay daquela cena. A mesma sequência de imagens, mas agora **você comanda a
+reprodução**. Essa diferença — de "assistir" para "controlar" — é enorme.
+
+Animações em CSS (`@keyframes`, `transition`) são o filme sem controle: você as
+declara e elas tocam segundo suas regras. Poderosas, mas você não tem um "controle
+remoto" fácil para pausar no meio, inverter, ou acelerar em resposta a algo. A **Web
+Animations API** (WAAPI) é o controle remoto. Você anima via JavaScript com
+`element.animate()`, e ela te devolve um **objeto Animation** que você pode `play()`,
+`pause()`, `reverse()`, cuja velocidade você ajusta com `playbackRate`, e cujo
+progresso você lê e escreve. É a ponte entre a conveniência do CSS e o controle
+total do JavaScript — animação imperativa, sem nenhuma biblioteca.
+
+</Analogia>
+
+## Animar e controlar
+
+```js
+const anim = box.animate(
+  [{ transform: "translateX(0)" }, { transform: "translateX(220px)" }], // keyframes
+  { duration: 900, iterations: Infinity, direction: "alternate", easing: "ease-in-out" },
+);
+
+anim.playbackRate = 1.5;  // 50% mais rápido
+// anim.pause();  anim.reverse();  anim.currentTime = 300;  anim.cancel();
+```
+
+O primeiro argumento são os **keyframes** (um array de estados — os mesmos conceitos
+do `@keyframes`, agora como objetos JS). O segundo são as **opções** (duração,
+repetições, direção, easing). E o retorno — o `anim` — é o seu controle remoto.
+
+<Aprofundamento titulo="playbackRate, composite e por que a WAAPI é o motor por baixo">
+
+Três superpoderes da WAAPI que o CSS não te dá com a mesma facilidade:
+
+1. **`playbackRate` dinâmico.** Você pode acelerar ou desacelerar uma animação **em
+   tempo real**, inclusive suavemente. Isso é ouro para reagir a gestos: uma
+   animação de loading que acelera conforme o progresso real chega, um efeito que
+   responde à velocidade do scroll. Valor negativo até roda **de trás para frente**.
+
+2. **`composite`.** Por padrão, uma animação **substitui** o valor da propriedade.
+   Com `composite: "add"`, ela **soma** ao valor existente — permitindo empilhar
+   várias animações na mesma propriedade sem uma apagar a outra (um shake somado a um
+   deslocamento, por exemplo). É o que torna possível compor movimentos complexos a
+   partir de peças independentes.
+
+3. **Controle e sincronia.** Como cada animação é um objeto com `currentTime`,
+   `playState` e uma `finished` (uma Promise que resolve quando termina!), você
+   coordena sequências com `await anim.finished`, sincroniza várias, e lê o progresso
+   para dirigir outras coisas.
+
+E aqui está o segredo que amarra o curso: **a WAAPI é o motor por baixo das
+bibliotecas de animação modernas**. Quando você usa o Motion (o `animate()` do
+Framer), boa parte roda sobre a Web Animations API do navegador — por isso é tão
+performático (o navegador otimiza no compositor, como no Módulo 1). Aprender a WAAPI
+é ver o maquinário por dentro da lib que você usa no AnimatedOdds. E como ela vive no
+navegador nativamente, é animação imperativa poderosa com **zero dependências** —
+muito no espírito "offline, sem CDN" desta plataforma.
+
+</Aprofundamento>
+
+<Dica>
+`anim.finished` é uma Promise — encadeie animações com elegância:
+`await box.animate(...).finished; await box.animate(...).finished;`. E
+`getAnimations()` num elemento devolve todas as animações ativas nele (CSS **e**
+WAAPI juntas), útil para pausar ou inspecionar tudo de uma vez.
+</Dica>
+
+<Meta>
+
+Anime a `.box` com a Web Animations API e **guarde** o objeto retornado numa variável
+`anim`:
+
+1. `const anim = box.animate([...keyframes], {...options})`.
+2. Keyframes: de `translateX(0)` a `translateX(220px)`.
+3. Opções: `duration: 900`, `iterations: Infinity`, `direction: "alternate"`,
+   `easing: "ease-in-out"`.
+4. Experimente o controle remoto: `anim.playbackRate = 1.5`.
+
+</Meta>

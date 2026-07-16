@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Faísca ⚡
 
-## Getting Started
+Plataforma pessoal de estudo de **animações web criativas** — estilo Codecademy,
+rodando local/self-hosted em Next.js. Conteúdo 100% autoral em pt-BR, código e
+APIs em inglês. Ver `plan-plataform.md` para o plano completo.
 
-First, run the development server:
+**Regra inegociável:** roda **100% offline**. Nenhuma requisição a CDN em runtime
+— fontes self-hosted (`@fontsource`), libs vendorizadas via npm, preview em
+`<iframe srcdoc>`. Teste de aceitação: desligar o Wi-Fi e completar uma lição.
+
+## Stack
+
+- **Next.js 16** (App Router, TypeScript, React Compiler)
+- **CSS Modules** + design tokens em CSS custom properties (sem Tailwind)
+- **MDX** (`@next/mdx`) para o conteúdo das lições; metadados em `content/curriculum.ts`
+- **CodeMirror 6** como editor in-browser
+- **better-sqlite3** para persistência local (`data/progress.db`)
+- **Motion** disponível para micro-interações (dogfooding)
+
+## Rodando
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build && npm start
+npm run lint     # biome
+npm run format   # biome --write
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O banco `data/progress.db` é criado automaticamente no primeiro acesso e está no
+`.gitignore`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Arquitetura (Fase 1)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/                     rotas (dashboard, /curso/[module]/[lesson], /conquistas, /playground, /desafios)
+  api/                   route handlers (progress, achievements, snippets)
+components/
+  editor/                CodeEditor, LessonWorkspace, Celebration
+  mdx/                   Analogia / Demo / Aprofundamento / Dica / Meta + demos
+  progress/              ProgressRing (o elemento-assinatura em SVG)
+  layout/                Nav
+content/
+  curriculum.ts          os 8 módulos e ~50 lições (fonte da verdade de metadados)
+  lessons/*.mdx          corpo autoral das lições (registrado em lessons/index.ts)
+lib/
+  db.ts, progress.ts     SQLite + regras de XP/streak/badges
+  preview/               buildSrcdoc + scripts injetados (console bridge, rAF spy, harness)
+  validation/            tipos dos checks declarativos
+```
 
-## Learn More
+### Motor de validação
 
-To learn more about Next.js, take a look at the following resources:
+Cada lição `auto` declara `checks` (JSON) em `curriculum.ts`. Ao clicar em
+**Verificar**, o preview é remontado com um harness injetado que roda os checks
+dentro do iframe e reporta via `postMessage` (com timeout para loops travados).
+Checks suportados: `elementExists`, `computedStyle`, `animationRegistered`,
+`functionDefined`, `functionReturns`, `rafActive`, `particleCount`,
+`canvasPainted`, `reducedMotionRespected`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estado
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Curso 100% completo** — os 8 módulos e as 52 lições estão autorais (prosa MDX +
+exercícios com starter/solução/checks ou checklist), verificadas em browser real.
+O badge "Formado" e a página de certificado com fireworks são conquistáveis só
+estudando. Próximos passos possíveis (opcionais, §10 do plano): infra de React no
+browser (`@babel/standalone`) para lições React declarativas, mídia de áudio real
+em `/public/media/`, sync opcional com Supabase, galeria de snippets, e um passe
+de polimento visual.
 
-## Deploy on Vercel
+### Histórico por módulo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Fases 1 e 2.**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Fase 1** (fundação): scaffold, tokens, fontes offline, SQLite + rotas,
+  pipeline MDX, editor + preview + console, motor de validação com todos os
+  helpers, página de lição funcional, dashboard.
+- **Fase 2** (conteúdo inicial + gamificação): Módulos 0 e 1 completos (15
+  lições autorais com starter/solução/checks verificados em browser real),
+  checklist de auto-avaliação para desafios, e todos os badges relevantes com
+  gatilhos (Primeira Faísca, módulo, Maratonista, Persistente, Perfeccionista,
+  Physics Nerd, Cientista, Formado).
+- **Módulo 2 — A Magia do SVG** (9 lições: viewBox, paths, stroke-dasharray,
+  ícones, gradientes, dataviz, spring physics, SVG em React, desafio dos 3
+  ícones). Adicionado o check `attribute` ao motor (para `viewBox`/`d`/`points`).
+- **Módulo 3 — Interações Avançadas** (7 lições: getBoundingClientRect, atan2,
+  scroll-driven CSS, IntersectionObserver, gestos/press-duration, View
+  Transitions, desafio do card com tilt 3D + glow). Adicionada a flag `declared`
+  ao check `computedStyle` (lê o valor autoral do CSSOM, robusto para props
+  novas como `animation-timeline` e `view-transition-name`).
+- **Módulo 4 — HTML Canvas** (8 lições: immediate mode, game loop, partículas em
+  escala, física, Perlin noise, Web Workers/OffscreenCanvas, árvore de decisão
+  Canvas/SVG/DOM, desafio de fireworks procedural). Adicionado o check
+  `expression` (avalia JS no sandbox) e o componente `VisualComplete` (checklist
+  + "Marcar como concluída") para lições `visual` sem editor.
+- **Módulo 5 — Design de Animação** (5 lições `visual`: princípios/squash&stretch,
+  orquestração/stagger, animar pela ação vs. estado, o bom gosto de quando NÃO
+  animar, e o desafio de redesenhar uma interação sem graça). Demos interativos
+  `SquashStretchDemo` e `StaggerDemo`.
+- **Módulo 6 — Desafios Finais** (4 desafios abertos de portfólio: explosão
+  estilo videogame, hero de landing SVG, scrollytelling de página inteira,
+  projeto final autoral).
+- **Página de certificado** (`/certificado`): o badge "Formado" desbloqueia um
+  certificado com **fireworks em Canvas** (a técnica do Módulo 4 dogfooded),
+  nome, XP e stats; estado bloqueado antes da conclusão; link em `/conquistas`.
+
+- **Módulo 7 — Bônus Whimsy** (4 lições: 3D com CSS puro/card flip, Web
+  Animations API, áudio-reativo com Web Audio, e o desafio do mini music player
+  com capa 3D flip + visualizador). O player toca **música real** — um loop lo-fi
+  sintetizado localmente em `/public/media/faisca-loop.wav` (offline, self-hosted)
+  e analisado ao vivo por `AnalyserNode`. `/media/*` é servido com CORS (`headers()`
+  no `next.config`) para o iframe sandbox (origem opaca) poder analisá-lo.
+
+Conteúdo de lição: prosa em `content/lessons/*.mdx` (registrada em
+`lessons/index.ts`), exercícios em `content/exercises.ts`.

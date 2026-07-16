@@ -1,0 +1,67 @@
+<Analogia titulo="Meio caminho entre dois amigos">
+
+Você está no número 0 da rua e seu amigo no número 100. Onde fica o **meio do
+caminho**? No 50, claro. E a um quarto do caminho, saindo de você? No 25. Você
+acabou de fazer, de cabeça, uma **interpolação linear**.
+
+`lerp` (de *linear interpolation*) é só isso, formalizado: dado um ponto de
+partida `a`, um destino `b`, e uma fração `t` entre 0 e 1, ele te dá o valor
+naquele ponto do caminho. `t = 0` é você, `t = 1` é seu amigo, `t = 0.5` é o meio.
+Parece bobo — mas é uma das ferramentas mais poderosas de toda animação. Cor,
+posição, ângulo, tamanho, opacidade: tudo que tem um "início" e um "fim" pode ser
+suavizado com `lerp`.
+
+</Analogia>
+
+## A fórmula (e por que ela funciona)
+
+```js
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+```
+
+Leia em voz alta: "comece em `a`, e ande `t` da distância total `(b - a)`". Se
+`t = 0`, você anda nada e fica em `a`. Se `t = 1`, você anda a distância inteira e
+chega em `b`. Qualquer valor no meio te dá um ponto proporcional. Simples,
+elegante, e a base de quase tudo que vem a seguir.
+
+<Aprofundamento titulo="O truque do lerp exponencial (o segredo do 'suave')">
+
+Existe um uso de `lerp` que parece mágica quando você descobre. Em vez de
+interpolar de A a B com um `t` que cresce, você faz o valor **atual** perseguir um
+**alvo** um pouquinho a cada frame:
+
+```js
+// a cada frame:
+current = lerp(current, target, 0.1);
+```
+
+Como `current` sempre anda 10% do que **falta**, ele começa rápido (falta muito) e
+desacelera naturalmente ao se aproximar (falta pouco) — um *ease-out* que emerge
+de graça, sem curva de bezier nenhuma. É assim que se faz um cursor customizado
+"deslizar" atrás do mouse, um número "correr" até seu valor, uma câmera seguir o
+personagem com suavidade. Mude o `0.1` e você muda a "rigidez" da perseguição.
+
+Cuidado com um detalhe: esse lerp nunca chega **exatamente** no alvo (10% de algo
+minúsculo ainda é algo). Na prática, você para quando a distância fica desprezível.
+
+</Aprofundamento>
+
+<Dica>
+`t` fora do intervalo 0–1 também funciona e é útil: `t = 1.2` faz *overshoot*
+(passa do alvo), `t = -0.2` faz *undershoot* (recua antes). É o mesmo espírito do
+overshoot que você viu no easing — agora na mão, em JavaScript.
+</Dica>
+
+<Meta>
+
+Implemente a função `lerp(a, b, t)`:
+
+- `t = 0` deve retornar `a`
+- `t = 1` deve retornar `b`
+- `t = 0.5` deve retornar o meio
+
+Abra o console para ver o resultado do seu `lerp` e clique em **Verificar**.
+
+</Meta>

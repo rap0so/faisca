@@ -1,0 +1,133 @@
+/* Shared block rhythm */
+.analogia,
+.demo,
+.aprofundamento,
+.dica,
+.meta {
+  margin: var(--sp-5) 0;
+}
+
+/* --- Analogia (the signature opener) --------------------- */
+.analogia {
+  position: relative;
+  padding: var(--sp-5);
+  border-radius: var(--r-lg);
+  background: linear-gradient(
+    135deg,
+    var(--spark-soft),
+    color-mix(in srgb, var(--spark) 4%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--spark) 35%, transparent);
+}
+.analogiaKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--spark);
+  margin-bottom: var(--sp-3);
+}
+.analogiaBody {
+  font-size: 1.05rem;
+  color: var(--text);
+}
+.analogiaBody :is(p) + :is(p) {
+  margin-top: var(--sp-3);
+}
+
+/* --- Demo ------------------------------------------------ */
+.demo {
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--surface-1);
+}
+.demoCap {
+  padding: var(--sp-2) var(--sp-4);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-2);
+}
+.demoStage {
+  padding: var(--sp-6);
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+}
+
+/* --- Aprofundamento (collapsible) ------------------------ */
+.aprofundamento {
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  overflow: hidden;
+}
+.aprofundamentoToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--pulse);
+}
+.aprofundamentoToggle:hover {
+  background: var(--pulse-soft);
+}
+.chevron {
+  transition: transform var(--dur-fast) var(--ease-out);
+  color: var(--pulse);
+}
+.aprofundamento[data-open] .chevron {
+  transform: rotate(90deg);
+}
+.aprofundamentoBody {
+  padding: 0 var(--sp-4) var(--sp-4);
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* --- Dica ------------------------------------------------ */
+.dica {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--mint);
+  background: var(--mint-soft);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  font-size: 0.95rem;
+}
+.dicaKicker {
+  font-weight: 700;
+  color: var(--mint);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  padding-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+/* --- Meta ------------------------------------------------ */
+.meta {
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px dashed var(--line);
+  background: var(--surface-1);
+}
+.metaKicker {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--paper);
+  margin-bottom: var(--sp-2);
+}

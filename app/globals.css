@@ -1,26 +1,199 @@
-@import "tailwindcss";
+/* ============================================================
+   Faísca — global stylesheet
+   "caderno de laboratório de um animador": fundo escuro profundo,
+   uma assinatura forte (o anel SVG), o resto quieto.
+   Zero requisições externas: fontes vêm de @fontsource (self-hosted).
+   ============================================================ */
 
+/* --- minimal reset --------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  min-height: 100dvh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img,
+picture,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+p,
+h1,
+h2,
+h3,
+h4 {
+  overflow-wrap: break-word;
+}
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+}
+
+/* --- design tokens (§8) ---------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* core palette */
+  --ink: #0e0f14; /* deep background */
+  --paper: #f5f2ea; /* primary text */
+  --spark: #ffb03a; /* amber — actions / XP */
+  --pulse: #7c5cff; /* violet — progress */
+  --mint: #3ecf8e; /* green — success / checks */
+  --alert: #ff6b6b; /* red — failed checks */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* derived surfaces (layered depth over --ink) */
+  --surface-1: #14161d;
+  --surface-2: #1b1e27;
+  --surface-3: #232734;
+  --line: #2c3140;
+  --line-soft: #22262f;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* text ramp */
+  --text: var(--paper);
+  --text-dim: #b9b4a8;
+  --text-faint: #78736a;
+
+  /* accent tints */
+  --spark-soft: rgba(255, 176, 58, 0.14);
+  --pulse-soft: rgba(124, 92, 255, 0.16);
+  --mint-soft: rgba(62, 207, 142, 0.14);
+
+  /* typography */
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  /* spacing scale (vertical rhythm) */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
+
+  /* radii */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* motion */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur-med: 240ms;
+
+  /* shadows */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --focus-ring: 0 0 0 3px rgba(124, 92, 255, 0.55);
+
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  /* subtle grid — the "lab notebook" paper, very quiet */
+  background-image:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(124, 92, 255, 0.08),
+      transparent 55%
+    ), linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    32px 32px,
+    32px 32px;
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* --- shared focus visibility ----------------------------- */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--r-sm);
+}
+
+/* --- reduced motion: the platform practices what it teaches */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- selection ------------------------------------------- */
+::selection {
+  background: var(--spark);
+  color: var(--ink);
+}
+
+/* --- scrollbars (quiet) ---------------------------------- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: var(--r-pill);
+  border: 2px solid var(--ink);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-3);
 }

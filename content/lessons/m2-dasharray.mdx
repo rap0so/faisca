@@ -1,0 +1,76 @@
+<Analogia titulo="A costura tracejada que some">
+
+Sabe aquela linha pontilhada de "recorte aqui" numa embalagem? Ela é feita de
+traços e espaços que se alternam. Agora imagina que você pudesse controlar o
+**tamanho** de cada traço e o **quanto** eles estão deslocados na linha. Se você
+fizer o traço ser **do tamanho da linha inteira** e depois for **empurrando** esse
+traço para fora de vista aos poucos... a linha parece **se desenhar sozinha**,
+como uma caneta invisível traçando o caminho.
+
+Esse é o truque mais gostoso e assinatura de todo o SVG: `stroke-dasharray` (o
+tamanho dos traços) + `stroke-dashoffset` (o deslocamento). É literalmente a
+técnica que faz o **anel de progresso desta plataforma** se desenhar quando você
+ganha XP. Uma vez que você vê como funciona, passa a reconhecê-la em todo lugar:
+assinaturas animadas, logos que se traçam, checkmarks que aparecem, gráficos que
+crescem.
+
+</Analogia>
+
+## A receita do "self-drawing"
+
+```css
+.line {
+  stroke-dasharray: 300;   /* um traço gigante do tamanho da linha */
+}
+@keyframes draw {
+  from { stroke-dashoffset: 300; }  /* traço empurrado para fora: invisível */
+  to   { stroke-dashoffset: 0; }    /* traço no lugar: linha inteira visível */
+}
+```
+
+Com `dasharray: 300`, você criou um único traço de 300 unidades seguido de um
+espaço de 300. Com `dashoffset: 300`, você empurra esse traço 300 unidades para
+trás — para fora da linha, então nada aparece. Anime o offset de `300` até `0` e o
+traço **desliza de volta** para o caminho, revelando a linha ponto a ponto. Mágica
+que é pura geometria.
+
+<Aprofundamento titulo="getTotalLength: o número mágico sem chutar">
+
+No exemplo usamos `300` "no olho". Mas cada caminho tem um comprimento exato, e o
+JavaScript sabe qual é:
+
+```js
+const path = document.querySelector(".line");
+const len = path.getTotalLength();      // o comprimento real, em unidades
+path.style.strokeDasharray = len;
+path.style.strokeDashoffset = len;      // começa escondido
+// depois, anime o offset para 0
+```
+
+Isso torna o efeito **perfeito** para qualquer caminho, sem tentativa e erro.
+Padrão profissional: leia `getTotalLength()`, use-o tanto no `dasharray` quanto no
+`dashoffset` inicial, e então anime o offset até 0 (via CSS transition, `@keyframes`
+ou a Web Animations API).
+
+Um detalhe de acessibilidade que fecha o módulo com coerência: como isso é uma
+`animation`, lembre do guard `prefers-reduced-motion` — para quem pediu menos
+movimento, mostre a linha já desenhada (offset 0 de cara), sem o traçado animado.
+
+</Aprofundamento>
+
+<Dica>
+`stroke-dasharray: 8 4` (dois números) faz traços de 8 e espaços de 4 — a linha
+pontilhada clássica. Animar o `dashoffset` de uma linha pontilhada cria o efeito de
+"formigas marchando" (marching ants), ótimo para seleções e bordas vivas.
+</Dica>
+
+<Meta>
+
+Faça a linha **se desenhar sozinha**, em loop:
+
+1. Dê à `.line` um `stroke-dasharray: 300`.
+2. Crie um `@keyframes draw` que vai de `stroke-dashoffset: 300` (escondido) até
+   `0` (visível).
+3. Aplique a animação na `.line` (`2s`, repetindo).
+
+</Meta>
