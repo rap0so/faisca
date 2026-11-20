@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local sqlite database
 /data
+
+# planning notes (local only)
+plan-plataform.md

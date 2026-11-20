@@ -1,8 +1,25 @@
 # Faísca ⚡
 
-Plataforma pessoal de estudo de **animações web criativas** — estilo Codecademy,
-rodando local/self-hosted em Next.js. Conteúdo 100% autoral em pt-BR, código e
-APIs em inglês. Ver `plan-plataform.md` para o plano completo.
+> A self-hosted, Codecademy-style platform for learning **creative web animation**
+> (CSS, SVG, Canvas, Web Audio, motion design). 8 modules and 52 original lessons
+> in Brazilian Portuguese, each with an in-browser editor, a live preview and
+> automated checks. It runs 100% offline.
+
+Plataforma de estudo de **animações web criativas** no estilo Codecademy,
+rodando local/self-hosted em Next.js. Conteúdo 100% autoral em pt-BR; código e
+APIs em inglês.
+
+**O que tem dentro:**
+
+- **8 módulos, 52 lições**: partículas, SVG, interações avançadas, Canvas,
+  design de animação, desafios de portfólio e um módulo bônus (3D com CSS, WAAPI,
+  áudio-reativo)
+- **Editor + preview ao vivo**: CodeMirror 6 com preview em `<iframe srcdoc>` e
+  console integrado
+- **Motor de validação**: cada exercício tem checks declarativos que rodam
+  dentro do iframe (estilos computados, `requestAnimationFrame` ativo, canvas
+  pintado, `prefers-reduced-motion` respeitado…)
+- **Gamificação**: XP, streak, badges e um certificado com fireworks em Canvas
 
 **Regra inegociável:** roda **100% offline**. Nenhuma requisição a CDN em runtime
 — fontes self-hosted (`@fontsource`), libs vendorizadas via npm, preview em
@@ -113,3 +130,7 @@ de polimento visual.
 
 Conteúdo de lição: prosa em `content/lessons/*.mdx` (registrada em
 `lessons/index.ts`), exercícios em `content/exercises.ts`.
+
+## Licença
+
+MIT. Ver [LICENSE](LICENSE).
